@@ -1,8 +1,63 @@
 {
   "channels": [
     {
+      "name": "News",
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=925wmb-4Yr4",
+          "sectionStart": 380,
+          "sectionEnd": 1160
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=EPYy_g8NzmI",
+          "sectionStart": 70,
+          "sectionEnd": 660
+        }
+      ]
+    },
+    {
+      "name": "Cooking",
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=Wwgn5k_TzKM",
+          "sectionStart": 26,
+          "sectionEnd": 223
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=yC8fvt-CxP0",
+          "sectionStart": 154,
+          "sectionEnd": 441
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=dsg5H2TEQXs",
+          "sectionStart": 53,
+          "sectionEnd": 259
+        }
+      ]
+    },
+    {
       "name": "Science",
       "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=f8CXG7dS-D0",
+          "sectionStart": 25,
+          "sectionEnd": 1492
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=MmG2ah5Df4g",
+          "sectionstart": 70,
+          "sectionend": 620
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=Hp9PIXOYaEA",
+          "sectionstart": 70,
+          "sectionend": 800
+        },
+        {
+          "url": "https://www.youtube.com/watch?v=aFlromB6SnU",
+          "sectionstart": 2,
+          "sectionend": 755
+        },
         {
           "url": "https://www.youtube.com/watch?v=f8CXG7dS-D0",
           "sectionStart": 25,
@@ -12,6 +67,43 @@
     },
     {
       "name": "Documentary",
+      "videos": []
+    },
+    {
+      "name": "Gaming",
+      "videos": []
+    },
+    {
+      "name": "Cartoons",
+      "videos": []
+    },
+    {
+      "name": "Home",
+      "videos": []
+    },
+
+    {
+      "name": "Sports",
+      "videos": []
+    },
+    {
+      "name": "Engineering",
+      "videos": []
+    },
+    {
+      "name": "Programming",
+      "videos": []
+    },
+    {
+      "name": "DIY",
+      "videos": []
+    },
+    {
+      "name": "Outdoors",
+      "videos": []
+    },
+    {
+      "name": "History",
       "videos": []
     },
     {
