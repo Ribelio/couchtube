@@ -519,21 +519,27 @@ const initApp = async (playerElementId) => {
     }
   };
 
-  const onError = ({ data }) => {
-    const errorCode = data;
+  const onError = ({ data: errorCode }) => {
     switch (errorCode) {
       case 100:
-        console.error('Video is unavailable: removed or marked as private.');
+        console.error(
+          'Error code:',
+          errorCode,
+          'Video is unavailable: removed or marked as private.'
+        );
         handleUnavailableVideo(state);
         break;
       case 101:
       case 150:
-        console.error('Video cannot be embedded.');
+        console.error('Error code:', errorCode, 'Video cannot be embedded.');
         handleUnavailableVideo(state);
         break;
       default:
-        console.error('An unknown error occurred with the video.');
-        handleUnavailableVideo(state);
+        console.error(
+          'Error code:',
+          errorCode,
+          'An unknown error occurred with the video.'
+        );
     }
   };
 
