@@ -21,7 +21,13 @@
     },
     {
       "name": "Music & Performing Arts",
-      "videos": []
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=Rbz0JZxyzxE",
+          "sectionStart": 0,
+          "sectionEnd": 521
+        }
+      ]
     },
     {
       "name": "Sports & Fitness",
@@ -126,7 +132,13 @@
     },
     {
       "name": "Comedy & Humor",
-      "videos": []
+      "videos": [
+        {
+          "url": "https://www.youtube.com/watch?v=qpaue3Jhn1o",
+          "sectionStart": 0,
+          "sectionEnd": 144
+        }
+      ]
     },
     {
       "name": "Productivity & Life Skills",
