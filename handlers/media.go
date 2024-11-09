@@ -71,6 +71,7 @@ func (h *Media) GetCurrentVideo(w http.ResponseWriter, r *http.Request) {
 		// if videoId is not provided, call GetCurrentVideoByChannelId
 		video, err = h.Service.GetCurrentVideoByChannelId(channelIDInt)
 		if err != nil {
+			println(err.Error())
 			http.Error(w, "Failed to load video", http.StatusInternalServerError)
 			return
 		}

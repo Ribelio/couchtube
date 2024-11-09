@@ -4,12 +4,12 @@
       "name": "News",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=925wmb-4Yr4",
+          "id": "925wmb-4Yr4",
           "sectionStart": 380,
           "sectionEnd": 1160
         },
         {
-          "url": "https://www.youtube.com/watch?v=EPYy_g8NzmI",
+          "id": "EPYy_g8NzmI",
           "sectionStart": 70,
           "sectionEnd": 660
         }
@@ -23,7 +23,7 @@
       "name": "Music & Performing Arts",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=Rbz0JZxyzxE",
+          "id": "Rbz0JZxyzxE",
           "sectionStart": 0,
           "sectionEnd": 521
         }
@@ -37,17 +37,17 @@
       "name": "Cooking",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=Wwgn5k_TzKM",
+          "id": "Wwgn5k_TzKM",
           "sectionStart": 26,
           "sectionEnd": 223
         },
         {
-          "url": "https://www.youtube.com/watch?v=yC8fvt-CxP0",
+          "id": "yC8fvt-CxP0",
           "sectionStart": 154,
           "sectionEnd": 441
         },
         {
-          "url": "https://www.youtube.com/watch?v=dsg5H2TEQXs",
+          "id": "dsg5H2TEQXs",
           "sectionStart": 53,
           "sectionEnd": 259
         }
@@ -61,22 +61,22 @@
       "name": "Science",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=f8CXG7dS-D0",
+          "id": "f8CXG7dS-D0",
           "sectionStart": 25,
           "sectionEnd": 1492
         },
         {
-          "url": "https://www.youtube.com/watch?v=MmG2ah5Df4g",
+          "id": "MmG2ah5Df4g",
           "sectionStart": 70,
           "sectionEnd": 620
         },
         {
-          "url": "https://www.youtube.com/watch?v=Hp9PIXOYaEA",
+          "id": "Hp9PIXOYaEA",
           "sectionStart": 70,
           "sectionEnd": 800
         },
         {
-          "url": "https://www.youtube.com/watch?v=aFlromB6SnU",
+          "id": "aFlromB6SnU",
           "sectionStart": 2,
           "sectionEnd": 755
         }
@@ -134,7 +134,7 @@
       "name": "Comedy & Humor",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=qpaue3Jhn1o",
+          "id": "qpaue3Jhn1o",
           "sectionStart": 0,
           "sectionEnd": 144
         }

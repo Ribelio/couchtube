@@ -26,11 +26,12 @@ func (r *channelRepository) BeginTx() (*sql.Tx, error) {
 
 func (r *channelRepository) FetchAllChannels() ([]dbmodels.Channel, error) {
 	query := `
-		SELECT c.id, c.name
-		FROM channels c
-		JOIN videos v ON c.id = v.channel_id
-		GROUP BY c.id, c.name;
-	`
+    SELECT id, name
+    FROM channels
+    WHERE EXISTS (
+        SELECT 1 FROM channel_videos
+        WHERE channel_videos.channel_id = channels.id
+    );`
 
 	rows, err := r.db.Query(query)
 	if err != nil {

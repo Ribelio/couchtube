@@ -122,12 +122,12 @@ Create your JSON file using the following format:
       "name": "Channel Name",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=VIDEO_ID",
+          "id": "VIDEO_ID",
           "sectionStart": 10,
           "sectionEnd": 300
         },
         {
-          "url": "https://www.youtube.com/watch?v=ANOTHER_VIDEO_ID",
+          "id": "ANOTHER_VIDEO_ID",
           "sectionStart": 0,
           "sectionEnd": 200
         }
@@ -137,7 +137,7 @@ Create your JSON file using the following format:
       "name": "Another Channel Name",
       "videos": [
         {
-          "url": "https://www.youtube.com/watch?v=DIFFERENT_VIDEO_ID",
+          "id": "DIFFERENT_VIDEO_ID",
           "sectionStart": 0,
           "sectionEnd": 150
         }
@@ -152,7 +152,7 @@ Create your JSON file using the following format:
 - **channels**: An array of channel objects. Each channel contains:
   - **name**: The channel name.
   - **videos**: An array of video objects containing:
-    - **url**: The URL of the YouTube video.
+    - **id**: The ID of the YouTube video.
     - **sectionStart**: The start time (in seconds) within the video where playback begins.
     - **sectionEnd**: The end time (in seconds) within the video where playback ends.
 

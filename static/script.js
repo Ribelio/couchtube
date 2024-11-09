@@ -1,3 +1,4 @@
+const YOUTUBE_BASE_VIDEO_URL = 'https://www.youtube.com/watch?v=';
 const IFRAME_API_URL = 'https://www.youtube.com/iframe_api';
 const BUFFERING_TIMEOUT = 3500;
 const CHANNELS_ENDPOINT = '/api/channels';
@@ -71,11 +72,6 @@ const handleUnavailableVideo = async (state) => {
     state.currentChannel = newChannel;
     state.currentVideo = newVideo;
   }
-};
-
-const extractVideoId = (url) => {
-  const match = url.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/);
-  return match ? match[1] : null;
 };
 
 const showBuffering = () => {
@@ -237,7 +233,7 @@ const changeChannel = async (state, offset) => {
   const newChannel = channels[newIndex];
   const newVideo = await fetchCurrentVideo(newChannel.id);
   if (newVideo) {
-    const videoId = extractVideoId(newVideo.url);
+    const videoId = newVideo.id;
     if (videoId) {
       player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
       player.mute();
@@ -255,7 +251,7 @@ const jumpToChannel = async (player, channels, channelId) => {
   const newChannel = channels.find((channel) => channel.id === channelId);
   const newVideo = await fetchCurrentVideo(newChannel.id);
   if (newVideo) {
-    const videoId = extractVideoId(newVideo.url);
+    const videoId = newVideo.id;
     if (videoId) {
       player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
       player.mute();
@@ -422,7 +418,7 @@ const addEventListeners = (state) => {
     });
 
   document.querySelector('#video-link').addEventListener('click', () => {
-    window.open(state.currentVideo.url, '_blank');
+    window.open(YOUTUBE_BASE_VIDEO_URL + state.currentVideo.url, '_blank');
   });
 
   document.querySelector('#video-list-submit').addEventListener('click', () => {
@@ -457,7 +453,7 @@ const initApp = async (playerElementId) => {
   const onReady = async () => {
     const initialVideo = await fetchCurrentVideo(state.currentChannel.id);
     if (initialVideo) {
-      const videoId = extractVideoId(initialVideo.url);
+      const videoId = initialVideo.id;
       if (videoId) {
         state.player.cueVideoById({
           videoId,

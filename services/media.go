@@ -82,20 +82,9 @@ func (s *MediaService) FetchNextVideo(channelId int, videoId int) *dbmodels.Vide
 }
 
 func (s *MediaService) InvalidateVideo(videoId int) error {
-	err := db.WithTransaction(s.TxManager.GetDB(), func(tx *sql.Tx) error {
-		if err := s.VideoRepo.DeleteVideo(tx, videoId); err != nil {
-			println(1, err)
-			return err
-		}
-		return nil // No error, commit
+	return db.WithTransaction(s.TxManager.GetDB(), func(tx *sql.Tx) error {
+		return s.VideoRepo.DeleteVideo(tx, videoId)
 	})
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-
 }
 
 func (s *MediaService) SubmitList(list jsonmodels.SubmitListRequestJson) (bool, error) {
@@ -135,7 +124,7 @@ func (s *MediaService) SubmitList(list jsonmodels.SubmitListRequestJson) (bool, 
 				return err
 			}
 			for _, video := range channel.Videos {
-				if err := s.VideoRepo.SaveVideo(tx, channelID, video.Url, video.SectionStart, video.SectionEnd); err != nil {
+				if err := s.VideoRepo.SaveVideo(tx, channelID, video.Id, video.SectionStart, video.SectionEnd); err != nil {
 					return err
 				}
 			}

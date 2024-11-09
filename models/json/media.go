@@ -1,7 +1,7 @@
 package jsonmodels
 
 type VideoJson struct {
-	Url          string `json:"url"`
+	Id           string `json:"id"`
 	SectionStart int    `json:"sectionStart"`
 	SectionEnd   int    `json:"sectionEnd"`
 }
