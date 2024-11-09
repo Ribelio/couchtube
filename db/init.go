@@ -77,6 +77,11 @@ func populateDatabase(db *sql.DB) error {
 	}()
 
 	for _, channel := range channels.Channels {
+		if len(channel.Videos) == 0 {
+			log.Printf("Channel %s has no videos. Skipping.\n", channel.Name)
+			continue
+		}
+
 		channelID, err := insertOrGetChannelID(tx, channel.Name, insertChannelQuery)
 		if err != nil {
 			log.Fatal(err)
