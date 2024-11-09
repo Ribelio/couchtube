@@ -309,8 +309,11 @@ const submitVideoLink = async () => {
   });
   const data = await res.json();
   if (data.success) {
+    console.log('Video list submitted successfully');
+
     videoListInput.value = '';
     closeSettingsModal();
+    location.reload();
   }
 };
 
