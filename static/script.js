@@ -239,7 +239,7 @@ const changeChannel = async (state, offset) => {
       player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
       player.mute();
       player.playVideo();
-      if (state.isInteracted) {
+      if (state.isInteracted && !state.isMuted) {
         state.muted = false;
         player.unMute();
       }
