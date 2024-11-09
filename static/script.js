@@ -205,7 +205,7 @@ const toggleControlGroup = (isMinimized) => {
 
 const updateChannelName = (channel) => {
   const channelId = channel.id.toString().padStart(2, '0');
-  const channelName = `${channel.name} - ${channelId}`;
+  const channelName = `${channelId} - ${channel.name}`;
   const channelNameElement = document.querySelector('#channel-name');
   if (channelNameElement) {
     channelNameElement.innerHTML = channelName;
