@@ -56,10 +56,11 @@ func main() {
 
 	routes := []Route{
 		{Path: "/", Handler: http.FileServer(http.Dir("./static")).ServeHTTP, Readonly: false},
-		{Path: "/channels", Handler: mediaHandler.FetchAllChannels, Readonly: false},
-		{Path: "/current-video", Handler: mediaHandler.GetCurrentVideo, Readonly: false},
-		{Path: "/submit-list", Handler: mediaHandler.SubmitList, Readonly: readonlyEnabled},
-		{Path: "/invalidate-video", Handler: mediaHandler.InvalidateVideo, Readonly: readonlyEnabled},
+		{Path: "/api/channels", Handler: mediaHandler.FetchAllChannels, Readonly: false},
+		{Path: "/api/current-video", Handler: mediaHandler.GetCurrentVideo, Readonly: false},
+		{Path: "/api/submit-list", Handler: mediaHandler.SubmitList, Readonly: readonlyEnabled},
+		{Path: "/api/invalidate-video", Handler: mediaHandler.InvalidateVideo, Readonly: readonlyEnabled},
+		{Path: "/api/config", Handler: handlers.GetConfigs, Readonly: false},
 	}
 	registerRoutes(http.DefaultServeMux, routes)
 

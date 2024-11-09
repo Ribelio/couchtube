@@ -1,9 +1,9 @@
 const IFRAME_API_URL = 'https://www.youtube.com/iframe_api';
 const BUFFERING_TIMEOUT = 3500;
-const CHANNELS_ENDPOINT = '/channels';
-const CURRENT_VIDEO_ENDPOINT = '/current-video';
-const SUBMIT_VIDEO_ENDPOINT = '/submit-list';
-const INVALIDATE_VIDEO_ENDPOINT = '/invalidate-video';
+const CHANNELS_ENDPOINT = '/api/channels';
+const CURRENT_VIDEO_ENDPOINT = '/api/current-video';
+const SUBMIT_VIDEO_ENDPOINT = '/api/submit-list';
+const INVALIDATE_VIDEO_ENDPOINT = '/api/invalidate-video';
 const VOLUME_STEPS = 5;
 const VOLUME_BAR_TIMEOUT = 2000;
 const CHANNEL_NAME_TIMEOUT = 3000;
@@ -317,6 +317,35 @@ const submitVideoLink = async () => {
   }
 };
 
+async function fetchConfig() {
+  try {
+    const response = await fetch('/api/config');
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error('Failed to fetch config:', error);
+  }
+}
+
+function updateUIForReadOnlyMode(state) {
+  submitButton = document.querySelector('#video-list-submit');
+  videoListInput = document.querySelector('#video-list-input');
+  if (state.readonly) {
+    submitButton.disabled = true;
+    submitButton.style.opacity = '0.5';
+    videoListInput.disabled = true;
+    videoListInput.style.opacity = '0.5';
+    videoListInput.placeholder = 'Application is in readonly mode';
+  } else {
+    submitButton.disabled = false;
+    submitButton.style.opacity = '1';
+    videoListInput.disabled = false;
+    videoListInput.style.opacity = '1';
+    videoListInput.placeholder = 'Enter video list URL';
+  }
+}
+
 const addEventListeners = (state) => {
   // Add Event Listeners for all buttons
   const controls = {
@@ -409,6 +438,8 @@ const addEventListeners = (state) => {
   document.querySelector('#video-list-submit').addEventListener('click', () => {
     submitVideoLink();
   });
+
+  document.addEventListener('DOMContentLoaded', fetchConfig);
 };
 
 const initApp = async (playerElementId) => {
@@ -422,10 +453,15 @@ const initApp = async (playerElementId) => {
     currentVideo: null,
     channels,
     isInteracted: false,
-    currentVideoName: ''
+    currentVideoName: '',
+    readonly: false
   };
 
   addEventListeners(state);
+  fetchConfig().then((config) => {
+    state.readonly = config.readonly;
+    updateUIForReadOnlyMode(state);
+  });
   updateChannelList(state, channels);
 
   const onReady = async () => {
