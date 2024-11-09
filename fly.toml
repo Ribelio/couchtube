@@ -12,9 +12,7 @@ primary_region = 'waw'
   processes = ['app']
 
 [services]
-concurrency = { hard_limit = 1 }
-
-
+concurrency = { hard_limit = 1, soft_limit = 1 }
 
 [[vm]]
   memory = '256mb'
