@@ -67,12 +67,7 @@ const handleUnavailableVideo = async (state) => {
   const data = await res.json();
 
   if (data.success) {
-    const { newChannel, newVideo } = await changeChannel(
-      state.player,
-      state.channels,
-      state.currentChannel,
-      1
-    );
+    const { newChannel, newVideo } = await changeChannel(state, 1);
     state.currentChannel = newChannel;
     state.currentVideo = newVideo;
   }
@@ -233,7 +228,8 @@ const togglePlayPause = (player, isPlaying) => {
 };
 
 // Switch to the next or previous channel
-const changeChannel = async (player, channels, currentChannel, offset) => {
+const changeChannel = async (state, offset) => {
+  const { player, channels, currentChannel } = state;
   const currentIndex = channels.findIndex(
     (channel) => channel.id === currentChannel.id
   );
@@ -246,6 +242,10 @@ const changeChannel = async (player, channels, currentChannel, offset) => {
       player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
       player.mute();
       player.playVideo();
+      if (state.isInteracted) {
+        state.muted = false;
+        player.unMute();
+      }
     }
   }
   return { newChannel, newVideo };
@@ -356,23 +356,13 @@ const addEventListeners = (state) => {
       state.isMuted = toggleMute(state.player, state.isMuted);
     },
     chup: async () => {
-      const { newChannel, newVideo } = await changeChannel(
-        state.player,
-        state.channels,
-        state.currentChannel,
-        1
-      );
+      const { newChannel, newVideo } = await changeChannel(state, 1);
       state.currentChannel = newChannel;
       state.currentVideo = newVideo;
       updateChannelName(newChannel);
     },
     chdown: async () => {
-      const { newChannel, newVideo } = await changeChannel(
-        state.player,
-        state.channels,
-        state.currentChannel,
-        -1
-      );
+      const { newChannel, newVideo } = await changeChannel(state, -1);
       state.currentChannel = newChannel;
       state.currentVideo = newVideo;
       updateChannelName(newChannel);
@@ -497,12 +487,7 @@ const initApp = async (playerElementId) => {
         const currentTime = state.player.getCurrentTime();
         if (currentTime >= state.currentVideo.sectionEnd) {
           clearInterval(intervalId);
-          const { newChannel, newVideo } = await changeChannel(
-            state.player,
-            state.channels,
-            state.currentChannel,
-            1
-          );
+          const { newChannel, newVideo } = await changeChannel(state, 1);
           state.currentChannel = newChannel;
           state.currentVideo = newVideo;
         }
