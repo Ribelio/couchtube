@@ -16,6 +16,18 @@
       ]
     },
     {
+      "name": "Entertainment & Gaming",
+      "videos": []
+    },
+    {
+      "name": "Music & Performing Arts",
+      "videos": []
+    },
+    {
+      "name": "Sports & Fitness",
+      "videos": []
+    },
+    {
       "name": "Cooking",
       "videos": [
         {
@@ -36,6 +48,10 @@
       ]
     },
     {
+      "name": "Documentary & History",
+      "videos": []
+    },
+    {
       "name": "Science",
       "videos": [
         {
@@ -45,49 +61,51 @@
         },
         {
           "url": "https://www.youtube.com/watch?v=MmG2ah5Df4g",
-          "sectionstart": 70,
-          "sectionend": 620
+          "sectionStart": 70,
+          "sectionEnd": 620
         },
         {
           "url": "https://www.youtube.com/watch?v=Hp9PIXOYaEA",
-          "sectionstart": 70,
-          "sectionend": 800
+          "sectionStart": 70,
+          "sectionEnd": 800
         },
         {
           "url": "https://www.youtube.com/watch?v=aFlromB6SnU",
-          "sectionstart": 2,
-          "sectionend": 755
-        },
-        {
-          "url": "https://www.youtube.com/watch?v=f8CXG7dS-D0",
-          "sectionStart": 25,
-          "sectionEnd": 1492
+          "sectionStart": 2,
+          "sectionEnd": 755
         }
       ]
     },
     {
-      "name": "Documentary",
+      "name": "Health & Wellness",
       "videos": []
     },
     {
-      "name": "Gaming",
+      "name": "Technology",
       "videos": []
     },
     {
-      "name": "Cartoons",
+      "name": "Travel & Exploration",
       "videos": []
     },
     {
-      "name": "Home",
-      "videos": []
-    },
-
-    {
-      "name": "Sports",
+      "name": "Psychology & Self-Help",
       "videos": []
     },
     {
-      "name": "Engineering",
+      "name": "Education & Learning",
+      "videos": []
+    },
+    {
+      "name": "Family & Kids",
+      "videos": []
+    },
+    {
+      "name": "Outdoors & Adventure",
+      "videos": []
+    },
+    {
+      "name": "Culture & Society",
       "videos": []
     },
     {
@@ -95,19 +113,51 @@
       "videos": []
     },
     {
-      "name": "DIY",
+      "name": "Business & Finance",
       "videos": []
     },
     {
-      "name": "Outdoors",
+      "name": "Engineering & Design",
       "videos": []
     },
     {
-      "name": "History",
+      "name": "Motorsports & Automotive",
       "videos": []
     },
     {
-      "name": "Motorsports",
+      "name": "Comedy & Humor",
+      "videos": []
+    },
+    {
+      "name": "Productivity & Life Skills",
+      "videos": []
+    },
+    {
+      "name": "Visual Arts",
+      "videos": []
+    },
+    {
+      "name": "Cartoons For Adults",
+      "videos": []
+    },
+    {
+      "name": "Astronomy & Space",
+      "videos": []
+    },
+    {
+      "name": "Gardening & Nature",
+      "videos": []
+    },
+    {
+      "name": "Religion & Philosophy",
+      "videos": []
+    },
+    {
+      "name": "Politics & Government",
+      "videos": []
+    },
+    {
+      "name": "Home & DIY",
       "videos": []
     }
   ]
