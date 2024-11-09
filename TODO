@@ -1,3 +1,2 @@
 - Fix the issue with mutes where it mutes/unmutes itself
-- Hide video cards
 - Reload after submitting a new list and getting a success response

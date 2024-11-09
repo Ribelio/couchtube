@@ -40,7 +40,8 @@ const initializePlayer = (playerElementId, onReady, onStateChange, onError) => {
       iv_load_policy: 3,
       rel: 0,
       enablejsapi: 1,
-      autoplay: 1
+      autoplay: 1,
+      showinfo: 0
     }
   });
 };
