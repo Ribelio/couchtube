@@ -16,11 +16,11 @@
       ]
     },
     {
-      "name": "Entertainment & Gaming",
+      "name": "Entertainment",
       "videos": []
     },
     {
-      "name": "Music & Performing Arts",
+      "name": "Music",
       "videos": [
         {
           "id": "Rbz0JZxyzxE",
@@ -35,28 +35,8 @@
       ]
     },
     {
-      "name": "Sports & Fitness",
+      "name": "Sports",
       "videos": []
-    },
-    {
-      "name": "Cooking",
-      "videos": [
-        {
-          "id": "Wwgn5k_TzKM",
-          "sectionStart": 26,
-          "sectionEnd": 223
-        },
-        {
-          "id": "yC8fvt-CxP0",
-          "sectionStart": 154,
-          "sectionEnd": 441
-        },
-        {
-          "id": "dsg5H2TEQXs",
-          "sectionStart": 53,
-          "sectionEnd": 259
-        }
-      ]
     },
     {
       "name": "Documentary",
@@ -73,7 +53,6 @@
         }
       ]
     },
-    { "name": "History", "videos": [] },
     {
       "name": "Science",
       "videos": [
@@ -100,7 +79,11 @@
       ]
     },
     {
-      "name": "Health & Wellness",
+      "name": "History",
+      "videos": []
+    },
+    {
+      "name": "Health & Fitness",
       "videos": []
     },
     {
@@ -108,8 +91,34 @@
       "videos": []
     },
     {
-      "name": "Travel & Exploration",
+      "name": "Exploration",
+      "videos": []
+    },
+    {
+      "name": "Psychology & Self-Help",
+      "videos": []
+    },
+    {
+      "name": "Education",
+      "videos": []
+    },
+    {
+      "name": "Family & Kids",
+      "videos": []
+    },
+    {
+      "name": "Outdoors",
       "videos": [
+        {
+          "id": "vp_c9LbucdY",
+          "sectionStart": 60,
+          "sectionEnd": 2180
+        },
+        {
+          "id": "MOI6VNvmz68",
+          "sectionStart": 50,
+          "sectionEnd": 1330
+        },
         {
           "id": "s5CEWqoUTwk",
           "sectionStart": 50,
@@ -123,28 +132,38 @@
       ]
     },
     {
-      "name": "Psychology & Self-Help",
-      "videos": []
-    },
-    {
-      "name": "Education & Learning",
-      "videos": []
-    },
-    {
-      "name": "Family & Kids",
-      "videos": []
-    },
-    {
-      "name": "Outdoors & Adventure",
-      "videos": []
-    },
-    {
       "name": "Culture & Society",
       "videos": []
     },
     {
-      "name": "Programming",
-      "videos": []
+      "name": "Computers",
+      "videos": [
+        {
+          "id": "vc79sJ9VOqk",
+          "sectionStart": 0,
+          "sectionEnd": 1185
+        },
+        {
+          "id": "Ic0dkf1iFOY",
+          "sectionStart": 0,
+          "sectionEnd": 1500
+        },
+        {
+          "id": "tc4ROCJYbm0",
+          "sectionStart": 0,
+          "sectionEnd": 1600
+        },
+        {
+          "id": "KG2M4ttzBnY",
+          "sectionStart": 0,
+          "sectionEnd": 865
+        },
+        {
+          "id": "U_o8gerare0",
+          "sectionStart": 0,
+          "sectionEnd": 1550
+        }
+      ]
     },
     {
       "name": "Business & Finance",
@@ -159,7 +178,7 @@
       "videos": []
     },
     {
-      "name": "Comedy & Humor",
+      "name": "Comedy",
       "videos": [
         {
           "id": "qpaue3Jhn1o",
@@ -178,12 +197,9 @@
         }
       ]
     },
+
     {
-      "name": "Productivity & Life Skills",
-      "videos": []
-    },
-    {
-      "name": "Visual Arts",
+      "name": "Arts",
       "videos": []
     },
     {
@@ -191,7 +207,7 @@
       "videos": []
     },
     {
-      "name": "Astronomy & Space",
+      "name": "Astronomy",
       "videos": []
     },
     {
@@ -203,7 +219,7 @@
       "videos": []
     },
     {
-      "name": "Politics & Government",
+      "name": "Politics",
       "videos": []
     },
     {
@@ -223,6 +239,26 @@
           "id": "nCKkHqlx9dE",
           "sectionStart": 0,
           "sectionEnd": 660
+        }
+      ]
+    },
+    {
+      "name": "Food & Cooking",
+      "videos": [
+        {
+          "id": "Wwgn5k_TzKM",
+          "sectionStart": 26,
+          "sectionEnd": 223
+        },
+        {
+          "id": "yC8fvt-CxP0",
+          "sectionStart": 154,
+          "sectionEnd": 441
+        },
+        {
+          "id": "dsg5H2TEQXs",
+          "sectionStart": 53,
+          "sectionEnd": 259
         }
       ]
     }
