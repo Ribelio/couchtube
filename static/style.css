@@ -309,6 +309,10 @@ body {
   cursor: pointer;
 }
 
+.channel-list-item.active {
+  color: var(--tertiary-color);
+}
+
 .source-link {
   margin-top: 15px;
   display: flex;

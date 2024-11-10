@@ -158,6 +158,11 @@ const updateChannelList = (state, channels) => {
   const channelListItems = channels.map((channel) => {
     const channelListItem = document.createElement('div');
     channelListItem.classList.add('channel-list-item');
+
+    if (channel.id === state.currentChannel.id) {
+      channelListItem.classList.add('active');
+    }
+
     channelListItem.innerHTML = `${channel.id.toString().padStart(2, '0')} - ${
       channel.name
     }`;
