@@ -320,3 +320,14 @@ body {
   width: 20px;
   height: 20px;
 }
+
+@media (max-width: 768px) {
+  .modal-body {
+    max-width: 90vw;
+    max-height: 90vh;
+  }
+
+  .modal-content {
+    overflow-y: auto;
+  }
+}
