@@ -28,7 +28,7 @@ services:
       - "8081:8081"  
     environment:
       - PORT=8081
-      - DATABASE_FILE=/app/data/couchtube.db
+      #- DATABASE_FILE=/app/data/couchtube.db
       - READONLY_MODE=false
     restart: unless-stopped
     healthcheck:
