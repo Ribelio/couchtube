@@ -43,8 +43,8 @@ img {
 
 body {
   background-color: var(--background-color);
-  width: 100vw;
-  height: 100vh;
+  width: 100dvw;
+  height: 100dvh;
 
   font-family: 'VT323', monospace;
   font-weight: 400;
@@ -324,8 +324,8 @@ body {
 
 @media (max-width: 768px) {
   .modal-body {
-    max-width: 90vw;
-    max-height: 90vh;
+    max-width: 90dvw;
+    max-height: 90dvh;
   }
 
   .modal-content {
