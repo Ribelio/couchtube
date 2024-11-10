@@ -422,7 +422,7 @@ const addEventListeners = (state) => {
     });
 
   document.querySelector('#video-link').addEventListener('click', () => {
-    window.open(YOUTUBE_BASE_VIDEO_URL + state.currentVideo.url, '_blank');
+    window.open(YOUTUBE_BASE_VIDEO_URL + state.currentVideo.id, '_blank');
   });
 
   document.querySelector('#video-list-submit').addEventListener('click', () => {
