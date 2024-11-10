@@ -429,6 +429,59 @@ const addEventListeners = (state) => {
     submitVideoLink();
   });
 
+  document.addEventListener('keydown', (event) => {
+    switch (event.key) {
+      case 'ArrowLeft':
+        // Change to the previous channel
+        changeChannel(state, -1).then(({ newChannel, newVideo }) => {
+          state.currentChannel = newChannel;
+          state.currentVideo = newVideo;
+          updateChannelName(newChannel);
+        });
+        break;
+
+      case 'ArrowRight':
+        // Change to the next channel
+        changeChannel(state, 1).then(({ newChannel, newVideo }) => {
+          state.currentChannel = newChannel;
+          state.currentVideo = newVideo;
+          updateChannelName(newChannel);
+        });
+        break;
+
+      case 'ArrowUp':
+        // Increase volume
+        const currentVolume = state.player.getVolume();
+        const newVolumeUp = Math.min(currentVolume + VOLUME_STEPS, 100);
+        state.player.setVolume(newVolumeUp);
+        updateVolumeBar(newVolumeUp);
+        state.player.unMute();
+        state.isMuted = false;
+        break;
+
+      case 'ArrowDown':
+        // Decrease volume
+        const currentVolumeDown = state.player.getVolume();
+        const newVolumeDown = Math.max(currentVolumeDown - VOLUME_STEPS, 0);
+        state.player.setVolume(newVolumeDown);
+        updateVolumeBar(newVolumeDown);
+        state.player.unMute();
+        state.isMuted = false;
+        break;
+
+      case 'm':
+        // Control mute
+        state.isMuted = toggleMute(state.player, state.isMuted);
+        break;
+
+      case ' ':
+        // Toggle power (play/pause)
+        event.preventDefault(); // Prevent scrolling when pressing space
+        state.isPlaying = togglePlayPause(state.player, state.isPlaying);
+        break;
+    }
+  });
+
   document.addEventListener('DOMContentLoaded', fetchConfig);
 };
 
