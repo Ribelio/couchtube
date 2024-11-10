@@ -545,7 +545,6 @@ const initApp = async (playerElementId) => {
     state.readonly = config.readonly;
     updateUIForReadOnlyMode(state);
   });
-  updateChannelList(state, channels);
 
   const onReady = async () => {
     const initialVideo = await fetchCurrentVideo(state.currentChannel.id);
@@ -568,6 +567,7 @@ const initApp = async (playerElementId) => {
     state.currentVideoName = target.getVideoData().title;
 
     updateVideoLink(state);
+    updateChannelList(state, channels);
 
     if (state.isMuted) {
       setControlIcon('control-mute', ICONS.volume_muted, true);
