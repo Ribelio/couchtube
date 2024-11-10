@@ -180,15 +180,22 @@ const updateChannelList = (state, channels) => {
   channelList.append(...channelListItems);
 };
 
-const toggleFullscreen = (playerElementId) => {
-  const playerElement = document.getElementById(playerElementId);
-  const requestFullScreen =
-    playerElement.requestFullscreen ||
-    playerElement.mozRequestFullScreen ||
-    playerElement.webkitRequestFullScreen ||
-    playerElement.msRequestFullscreen;
-  if (requestFullScreen) {
-    requestFullScreen.call(playerElement);
+const toggleFullscreen = (state) => {
+  const playerElement = document.body;
+
+  if (state.isFullscreen) {
+    document.exitFullscreen();
+    state.isFullscreen = false;
+  } else {
+    const requestFullScreen =
+      playerElement.requestFullscreen ||
+      playerElement.mozRequestFullScreen ||
+      playerElement.webkitRequestFullScreen ||
+      playerElement.msRequestFullscreen;
+    if (requestFullScreen) {
+      requestFullScreen.call(playerElement);
+    }
+    state.isFullscreen = true;
   }
 };
 
@@ -410,7 +417,7 @@ const addEventListeners = (state) => {
       state.isMuted = false;
     },
     fullscreen: () => {
-      toggleFullscreen(playerElementId);
+      toggleFullscreen(state);
     },
     minimize: () => {
       state.isControlGroupMinimized = toggleControlGroup(
@@ -531,6 +538,7 @@ const initApp = async (playerElementId) => {
     player: null,
     isPlaying: false,
     isMuted: true,
+    isFullscreen: false,
     isControlGroupMinimized: false,
     currentChannel: randomChannel,
     currentVideo: null,
