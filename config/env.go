@@ -22,7 +22,7 @@ func init() {
 			log.Println("No .env file found, relying on system environment variables")
 		}
 
-		port = getEnv("PORT", "8081")
+		port = getEnv("PORT", "8363")
 		dbFilePath = getEnv("DATABASE_FILE", "couchtube.db")
 		readonly = getEnvAsBool("READONLY_MODE", false)
 	})

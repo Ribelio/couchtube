@@ -13,6 +13,6 @@ RUN go build -o main cmd/main.go
 
 COPY static /app/static
 
-EXPOSE 8081
+EXPOSE 8363
 
 CMD ["./main"]

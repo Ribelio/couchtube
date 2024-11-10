@@ -25,14 +25,13 @@ services:
     image: ghcr.io/ozencb/couchtube:latest
     container_name: couchtube_app
     ports:
-      - "8081:8081"  
+      - "8363:8363"  
     environment:
-      - PORT=8081
-      #- DATABASE_FILE=/app/data/couchtube.db
+      - PORT=8363
       - READONLY_MODE=false
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      test: ["CMD", "curl", "-f", "http://localhost:8363"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -44,11 +43,11 @@ Or start it directly with a `docker run` command:
 ```sh
 docker run -d \
   --name couchtube_app \
-  -p 8081:8081 \
-  -e PORT=8081 \
+  -p 8363:8363 \
+  -e PORT=8363 \
   -e READONLY_MODE=false \
   --restart unless-stopped \
-  --health-cmd="curl -f http://localhost:8081 || exit 1" \
+  --health-cmd="curl -f http://localhost:8363 || exit 1" \
   --health-interval=30s \
   --health-timeout=10s \
   --health-retries=3 \
@@ -61,7 +60,7 @@ docker run -d \
 Ensure you have Golang 1.22 or higher installed. Create a `.env` file with the same environment variables found in `docker-compose.yml`.
 
 ```dotenv
-PORT=8081
+PORT=8363
 DATABASE_FILE=/app/data/couchtube.db
 READONLY_MODE=false
 ```
@@ -81,10 +80,10 @@ READONLY_MODE=false
    ```sh
    go run main.go
    ```
-   The server will start on `http://localhost:8081`.
+   The server will start on `http://localhost:8363`.
 
 4. **Access the Application**:
-   Open a browser and go to `http://localhost:8081` to access CouchTube.
+   Open a browser and go to `http://localhost:8363` to access CouchTube.
 
 On the first run, CouchTube will create a `couchtube.db` SQLite database file, initialize necessary tables, and populate them with any default channels found in `default-channels.json`.
 
