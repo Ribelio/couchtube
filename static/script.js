@@ -319,7 +319,7 @@ const submitVideoLink = async () => {
   }
 };
 
-async function fetchConfig() {
+const fetchConfig = async () => {
   try {
     const response = await fetch('/api/config');
     const data = await response.json();
@@ -328,9 +328,9 @@ async function fetchConfig() {
   } catch (error) {
     console.error('Failed to fetch config:', error);
   }
-}
+};
 
-function updateUIForReadOnlyMode(state) {
+const updateUIForReadOnlyMode = (state) => {
   submitButton = document.querySelector('#video-list-submit');
   videoListInput = document.querySelector('#video-list-input');
   if (state.readonly) {
@@ -346,7 +346,26 @@ function updateUIForReadOnlyMode(state) {
     videoListInput.style.opacity = '1';
     videoListInput.placeholder = 'Enter video list URL';
   }
-}
+};
+
+const displayMessage = (message, title = ' ') => {
+  const messageModal = document.querySelector('#message-modal');
+  const messageTitle = document.querySelector('#message-modal-title-content');
+
+  if (title) {
+    messageTitle.innerHTML = title;
+  }
+
+  const messageContent = document.querySelector('#message-modal-content');
+  messageContent.innerHTML = message;
+
+  messageModal.classList.add('active');
+};
+
+const closeMessageModal = () => {
+  const messageModal = document.querySelector('#message-modal');
+  messageModal.classList.remove('active');
+};
 
 const addEventListeners = (state) => {
   // Add Event Listeners for all buttons
@@ -423,6 +442,12 @@ const addEventListeners = (state) => {
       closeSettingsModal();
     });
 
+  document
+    .querySelector('#message-modal-close-button')
+    .addEventListener('click', () => {
+      closeMessageModal();
+    });
+
   document.querySelector('#video-link').addEventListener('click', () => {
     window.open(YOUTUBE_BASE_VIDEO_URL + state.currentVideo.id, '_blank');
   });
@@ -489,12 +514,20 @@ const addEventListeners = (state) => {
 
 const initApp = async (playerElementId) => {
   const channels = await fetchChannels();
+
+  if (channels.length === 0) {
+    displayMessage('No channels available.');
+    return;
+  }
+
+  const randomChannel = channels[Math.floor(Math.random() * channels.length)];
+
   const state = {
     player: null,
     isPlaying: false,
     isMuted: true,
     isControlGroupMinimized: false,
-    currentChannel: channels[0] || null,
+    currentChannel: randomChannel,
     currentVideo: null,
     channels,
     isInteracted: false,
