@@ -192,7 +192,23 @@
     },
     {
       "name": "Engineering & Design",
-      "videos": []
+      "videos": [
+        {
+          "id": "W1L1sU0uI0o",
+          "sectionStart": 20,
+          "sectionEnd": 715
+        },
+        {
+          "id": "BKm45Az02YE",
+          "sectionStart": 0,
+          "sectionEnd": 950
+        },
+        {
+          "id": "KoJ0Pih0Ssc",
+          "sectionStart": 0,
+          "sectionEnd": 590
+        }
+      ]
     },
     {
       "name": "Motorsports & Automotive",
