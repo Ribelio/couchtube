@@ -162,11 +162,7 @@ const updateChannelList = (state, channels) => {
       channel.name
     }`;
     channelListItem.addEventListener('click', async () => {
-      const { newChannel, newVideo } = await jumpToChannel(
-        state.player,
-        state.channels,
-        channel.id
-      );
+      const { newChannel, newVideo } = await jumpToChannel(state, channel.id);
 
       state.currentChannel = newChannel;
       state.currentVideo = newVideo;
@@ -248,7 +244,8 @@ const changeChannel = async (state, offset) => {
   return { newChannel, newVideo };
 };
 
-const jumpToChannel = async (player, channels, channelId) => {
+const jumpToChannel = async (state, channelId) => {
+  const { player, channels } = state;
   const newChannel = channels.find((channel) => channel.id === channelId);
   const newVideo = await fetchCurrentVideo(newChannel.id);
   if (newVideo) {
@@ -257,6 +254,11 @@ const jumpToChannel = async (player, channels, channelId) => {
       player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
       player.mute();
       player.playVideo();
+
+      if (state.isInteracted && !state.isMuted) {
+        state.muted = false;
+        player.unMute();
+      }
     }
   }
   return { newChannel, newVideo };
