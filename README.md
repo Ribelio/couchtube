@@ -46,7 +46,6 @@ docker run -d \
   --name couchtube_app \
   -p 8081:8081 \
   -e PORT=8081 \
-  -e DATABASE_FILE=/app/data/couchtube.db \
   -e READONLY_MODE=false \
   --restart unless-stopped \
   --health-cmd="curl -f http://localhost:8081 || exit 1" \
