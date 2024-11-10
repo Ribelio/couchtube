@@ -307,3 +307,16 @@ body {
   padding: 0;
   cursor: pointer;
 }
+
+.source-link {
+  margin-top: 15px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  line-height: 1;
+}
+
+.source-link img {
+  width: 20px;
+  height: 20px;
+}
