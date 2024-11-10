@@ -319,6 +319,7 @@ body {
   gap: 5px;
   align-items: center;
   line-height: 1;
+  color: inherit;
 }
 
 .source-link img {
