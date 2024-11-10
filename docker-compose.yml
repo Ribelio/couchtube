@@ -6,10 +6,10 @@ services:
       - "8081:8081"  
     environment:
       - PORT=8081
-      - DATABASE_FILE=/app/data/couchtube.db
+      #- DATABASE_FILE=/app/data/couchtube.db
       - READONLY_MODE=false
-    volumes:
-      - ./data:/app/data  
+    #volumes:
+      #- ./data:/app/data  
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8081"]
