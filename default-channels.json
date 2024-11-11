@@ -456,16 +456,6 @@
     {
       "name": "Movies",
       "videos": [
-        {
-          "id": "9ZS6v9fQ6Ac",
-          "sectionStart": 0,
-          "sectionEnd": 641
-        },
-        {
-          "id": "0gyyGHHXfck",
-          "sectionStart": 0,
-          "sectionEnd": 300
-        }
       ]
     }
   ]
