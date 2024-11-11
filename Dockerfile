@@ -1,6 +1,6 @@
 FROM golang:1.22.3-alpine
 
-RUN apk update && apk add --no-cache sqlite
+RUN apk update && apk add --no-cache sqlite curl
 
 WORKDIR /app
 
