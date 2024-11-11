@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -94,17 +95,13 @@ func (h *Media) InvalidateVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	videoIDInt, err := strconv.Atoi(videoID)
-	if err != nil {
-		http.Error(w, "Invalid video-id", http.StatusBadRequest)
-		return
-	}
-
-	err = h.Service.InvalidateVideo(videoIDInt)
+	err := h.Service.InvalidateVideo(videoID)
 	if err != nil {
 		http.Error(w, "Failed to invalidate video", http.StatusInternalServerError)
 		return
 	}
+
+	log.Default().Println("Video invalidated: ", videoID)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)

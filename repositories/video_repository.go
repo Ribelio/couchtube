@@ -11,7 +11,7 @@ type VideoRepository interface {
 	GetVideosByChannelID(channelID int) ([]dbmodels.Video, error)
 	FetchNextVideo(videoID int, channelID int) (*dbmodels.Video, error)
 	SaveVideo(tx *sql.Tx, channelID int, videoUrl string, sectionStart int, sectionEnd int) error
-	DeleteVideo(tx *sql.Tx, videoID int) error
+	DeleteVideo(tx *sql.Tx, videoID string) error
 	DeleteAllVideos(tx *sql.Tx) error
 }
 
@@ -107,7 +107,7 @@ func (r *videoRepository) SaveVideo(tx *sql.Tx, channelID int, videoId string, s
 	return err
 }
 
-func (r *videoRepository) DeleteVideo(tx *sql.Tx, videoID int) error {
+func (r *videoRepository) DeleteVideo(tx *sql.Tx, videoID string) error {
 	exec := r.db.Exec
 	if tx != nil {
 		exec = tx.Exec

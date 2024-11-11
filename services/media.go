@@ -81,7 +81,7 @@ func (s *MediaService) FetchNextVideo(channelId int, videoId int) *dbmodels.Vide
 	return video
 }
 
-func (s *MediaService) InvalidateVideo(videoId int) error {
+func (s *MediaService) InvalidateVideo(videoId string) error {
 	return db.WithTransaction(s.TxManager.GetDB(), func(tx *sql.Tx) error {
 		return s.VideoRepo.DeleteVideo(tx, videoId)
 	})
