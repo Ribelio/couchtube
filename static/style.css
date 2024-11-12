@@ -254,6 +254,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  overflow-x: hidden;
 }
 
 .modal-close-button {
