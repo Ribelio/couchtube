@@ -1,17 +1,17 @@
 services:
   couchtube:
-    image: ghcr.io/ozencb/couchtube:latest
+    build: .
     container_name: couchtube_app
     ports:
       - "8363:8363"  
     environment:
       - PORT=8363
-      - DATABASE_FILE_PATH=/app/data/couchtube.db
-      - JSON_FILE_PATH=/app/data/videos.json
+      #- DATABASE_FILE_PATH=/app/data/couchtube.db
+      #- JSON_FILE_PATH=/app/data/videos.json
       - READONLY_MODE=false
-    volumes:
-      - ./videos.json:/app/data/videos.json:ro
-      - couchtube_db:/app/data
+    #volumes:
+    #  - ./videos.json:/app/data/videos.json:ro
+    #  - couchtube_db:/app/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8363"]
