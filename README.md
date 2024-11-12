@@ -61,7 +61,7 @@ Ensure you have Golang 1.22 or higher installed. Create a `.env` file with the s
 
 ```dotenv
 PORT=8363
-DATABASE_FILE=/app/data/couchtube.db
+DATABASE_FILE_PATH=/app/data/couchtube.db
 READONLY_MODE=false
 ```
 
@@ -85,7 +85,7 @@ READONLY_MODE=false
 4. **Access the Application**:
    Open a browser and go to `http://localhost:8363` to access CouchTube.
 
-On the first run, CouchTube will create a `couchtube.db` SQLite database file, initialize necessary tables, and populate them with any default channels found in `default-channels.json`.
+On the first run, CouchTube will create a `couchtube.db` SQLite database file, initialize necessary tables, and populate them with any default channels found in `videos.json`.
 
 
 ---
@@ -98,11 +98,11 @@ CouchTube loops through a channel's videos and only shows the section of the vid
 
 You can configure CouchTube using environment variables.
 
-| Variable        | Description                                                                 |
-| --------------- | --------------------------------------------------------------------------- |
-| `PORT`          | The port number on which CouchTube will run.                                |
-| `DATABASE_FILE` | The path to the SQLite database file used by CouchTube.                     |
-| `READONLY_MODE` | If set to `true`, CouchTube will run in read-only mode, preventing changes. |
+| Variable             | Description                                                                 |
+| -------------------- | --------------------------------------------------------------------------- |
+| `PORT`               | The port number on which CouchTube will run.                                |
+| `DATABASE_FILE_PATH` | The path to the SQLite database file used by CouchTube.                     |
+| `READONLY_MODE`      | If set to `true`, CouchTube will run in read-only mode, preventing changes. |
 
 
 ### Custom JSON Format for Channel and Video Lists
