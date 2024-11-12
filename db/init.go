@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/ozencb/couchtube/config"
 	"github.com/ozencb/couchtube/helpers"
 	jsonmodels "github.com/ozencb/couchtube/models/json"
 	_ "modernc.org/sqlite"
@@ -42,9 +41,8 @@ func createTables(db *sql.DB) error {
 }
 
 func populateDatabase(db *sql.DB) error {
-	jsonPath := config.GetJSONFilePath()
 	// Parse the JSON file and insert data into the database, if channels are not defined.
-	channels, err := helpers.LoadJSONFromFile[jsonmodels.ChannelsJson](jsonPath)
+	channels, err := helpers.LoadJSONFromFile[jsonmodels.ChannelsJson]("/videos.json")
 	if err != nil {
 		log.Fatal(err)
 		return err
