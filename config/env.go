@@ -10,10 +10,11 @@ import (
 )
 
 var (
-	port       string
-	dbFilePath string
-	readonly   bool
-	once       sync.Once
+	port         string
+	dbFilePath   string
+	jsonFilePath string
+	readonly     bool
+	once         sync.Once
 )
 
 func init() {
@@ -23,7 +24,8 @@ func init() {
 		}
 
 		port = getEnv("PORT", "8363")
-		dbFilePath = getEnv("DATABASE_FILE", "couchtube.db")
+		dbFilePath = getEnv("DATABASE_FILE_PATH", "couchtube.db")
+		jsonFilePath = getEnv("JSON_FILE_PATH", "videos.json")
 		readonly = getEnvAsBool("READONLY_MODE", false)
 	})
 }
@@ -53,6 +55,10 @@ func GetPort() string {
 
 func GetDBFilePath() string {
 	return dbFilePath
+}
+
+func GetJSONFilePath() string {
+	return jsonFilePath
 }
 
 func GetReadonlyMode() bool {
