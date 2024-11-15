@@ -102,6 +102,8 @@ You can configure CouchTube using environment variables.
 | -------------------- | --------------------------------------------------------------------------- |
 | `PORT`               | The port number on which CouchTube will run.                                |
 | `DATABASE_FILE_PATH` | The path to the SQLite database file used by CouchTube.                     |
+| `JSON_FILE_PATH`     | The path to the JSON file used by CouchTube.                                |
+| `FULL_SCAN`          | Overwrites the existing data in the DB with the videos in JSON file.        |
 | `READONLY_MODE`      | If set to `true`, CouchTube will run in read-only mode, preventing changes. |
 
 
