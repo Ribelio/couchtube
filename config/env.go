@@ -13,6 +13,7 @@ var (
 	port         string
 	dbFilePath   string
 	jsonFilePath string
+	fullScan     bool
 	readonly     bool
 	once         sync.Once
 )
@@ -25,7 +26,8 @@ func init() {
 
 		port = getEnv("PORT", "8363")
 		dbFilePath = getEnv("DATABASE_FILE_PATH", "couchtube.db")
-		jsonFilePath = getEnv("JSON_FILE_PATH", "videos.json")
+		jsonFilePath = getEnv("JSON_FILE_PATH", "/videos.json")
+		fullScan = getEnvAsBool("FULL_SCAN", false)
 		readonly = getEnvAsBool("READONLY_MODE", false)
 	})
 }
@@ -49,6 +51,16 @@ func getEnvAsBool(key string, fallback bool) bool {
 	return fallback
 }
 
+func getEnvAsPath(key string, fallback string) string {
+	path := getEnv(key, fallback)
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Fatalf("Path %s does not exist", path)
+	}
+
+	return path
+}
+
 func GetPort() string {
 	return port
 }
@@ -59,6 +71,10 @@ func GetDBFilePath() string {
 
 func GetJSONFilePath() string {
 	return jsonFilePath
+}
+
+func GetFullScan() bool {
+	return fullScan
 }
 
 func GetReadonlyMode() bool {

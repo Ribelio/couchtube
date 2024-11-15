@@ -52,10 +52,21 @@ func populateDatabase(db *sql.DB) error {
 
 	// Check if any channels already exist to avoid re-population.
 	var exists int
-	err = db.QueryRow(`SELECT EXISTS(SELECT 1 FROM channels LIMIT 1);`).Scan(&exists)
-	if err != nil {
-		log.Fatal(err)
-		return err
+
+	if !config.GetFullScan() {
+		err = db.QueryRow(`SELECT EXISTS(SELECT 1 FROM channels LIMIT 1);`).Scan(&exists)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
+	} else {
+		// If full scan is enabled, delete all data from the tables.
+		log.Println("Full scan enabled. Deleting all data from the database.")
+		_, err = db.Exec(`DELETE FROM channels; DELETE FROM videos; DELETE FROM channel_videos;`)
+		if err != nil {
+			log.Fatal(err)
+			return err
+		}
 	}
 
 	if exists == 1 {
