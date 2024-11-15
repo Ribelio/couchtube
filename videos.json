@@ -445,18 +445,12 @@
           "id": "yC8fvt-CxP0",
           "sectionStart": 154,
           "sectionEnd": 441
-        },
-        {
-          "id": "YFHHGETsxkE",
-          "sectionStart": 53,
-          "sectionEnd": 259
         }
       ]
     },
     {
       "name": "Movies",
-      "videos": [
-      ]
+      "videos": []
     }
   ]
 }
