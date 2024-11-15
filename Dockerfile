@@ -17,5 +17,6 @@ RUN mkdir -p /app/data
 WORKDIR /app
 COPY --from=builder /app/couchtube .
 COPY static /app/static
+COPY videos.json /app/data/videos.json
 EXPOSE 8363
 CMD ["./couchtube"]
