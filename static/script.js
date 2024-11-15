@@ -588,7 +588,7 @@ const initApp = async (playerElementId) => {
         const currentTime = state.player.getCurrentTime();
         if (currentTime >= state.currentVideo.sectionEnd) {
           clearInterval(intervalId);
-          const { newChannel, newVideo } = await changeChannel(state, 1);
+          const { newChannel, newVideo } = await changeChannel(state, 0);
           state.currentChannel = newChannel;
           state.currentVideo = newVideo;
         }
