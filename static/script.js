@@ -581,12 +581,19 @@ const initApp = async (playerElementId) => {
       setControlIcon('control-mute', ICONS.volume_muted, true);
     }
 
-    if (data === YT.PlayerState.PLAYING && state.currentVideo) {
+    if (
+      (data === YT.PlayerState.PLAYING || data === YT.PlayerState.ENDED) &&
+      state.currentVideo
+    ) {
       deactiveBuffering(state);
 
       const intervalId = setInterval(async () => {
         const currentTime = state.player.getCurrentTime();
-        if (currentTime >= state.currentVideo.sectionEnd) {
+
+        if (
+          currentTime >= state.currentVideo.sectionEnd ||
+          data === YT.PlayerState.ENDED
+        ) {
           clearInterval(intervalId);
           const { newChannel, newVideo } = await changeChannel(state, 0);
           state.currentChannel = newChannel;
