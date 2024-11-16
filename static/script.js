@@ -69,7 +69,7 @@ const handleUnavailableVideo = async (state) => {
   const data = await res.json();
 
   if (data.success) {
-    const { newChannel, newVideo } = await changeChannel(state, 1);
+    const { newChannel, newVideo } = await changeChannel(state, 0);
     state.currentChannel = newChannel;
     state.currentVideo = newVideo;
   }
