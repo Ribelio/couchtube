@@ -61,8 +61,15 @@ func populateDatabase(db *sql.DB) error {
 		}
 	} else {
 		// If full scan is enabled, delete all data from the tables.
+		// also reset id sequence for all tables,
 		log.Println("Full scan enabled. Deleting all data from the database.")
-		_, err = db.Exec(`DELETE FROM channels; DELETE FROM videos; DELETE FROM channel_videos;`)
+		_, err = db.Exec(`DELETE FROM channels;
+					      DELETE FROM videos;
+						  DELETE FROM channel_videos;
+						  DELETE FROM sqlite_sequence WHERE name IN ('channels', 'videos', 'channel_videos');
+						  VACUUM;
+						  `)
+
 		if err != nil {
 			log.Fatal(err)
 			return err
