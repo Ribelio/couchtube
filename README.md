@@ -102,6 +102,18 @@ You can configure CouchTube using environment variables.
 | `DEFAULT_CHANNELS_PATH`  | Path to the JSON file used to seed the database on first run. Default: `/videos.json`. |
 | `EDITOR_MODE`            | If set to `true`, enables the channel editor at `/editor`.                      |
 
+### Editor
+
+![CouchTube Editor](docs/screenshots/editor-screenshot.png)
+
+CouchTube includes a built-in channel editor at `/editor` (enable with `EDITOR_MODE=true`). The editor lets you:
+
+- **Manage channels** — create, rename, and delete channels from the sidebar
+- **Add videos** — paste a YouTube URL or video ID to add videos to a channel
+- **Set playback sections** — configure start and end times for each video to control which segment plays on air
+- **Preview** — preview individual video sections directly in the editor
+- **Import/Export JSON** — bulk import or export your entire channel configuration
+- **Import playlists** — paste a YouTube playlist URL to bulk-import videos into a channel
 
 ### Custom JSON Format for Channel and Video Lists
 
@@ -158,10 +170,6 @@ Save your custom JSON file using the above structure or make it accessible throu
 ### Uploading Custom JSON
 
 Within the CouchTube application, click the settings icon (gear icon) to submit a URL pointing to your custom JSON file. This URL should contain the JSON with channels and videos you want CouchTube to use.
-
-### Channel Editor
-
-CouchTube includes a built-in editor at `/editor` for managing channels and videos directly in the browser. You can add, edit, and delete channels and videos, as well as import/export your configuration as JSON.
 
 ---
 
