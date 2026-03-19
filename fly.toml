@@ -22,3 +22,4 @@ concurrency = { hard_limit = 1, soft_limit = 1 }
 
 [env]
   DEFAULT_CHANNELS_PATH = "/data/videos.json"
+  EDITOR_MODE = "readonly"

@@ -64,6 +64,16 @@ func main() {
 	mediaService := services.NewMediaService(txManager, channelRepo, videoRepo)
 	editorService := services.NewEditorService(txManager, channelRepo, videoRepo)
 
+	// Auto-populate defaults when not in full editor mode
+	if config.GetEditorMode() != "full" {
+		channels, err := mediaService.FetchAllChannels()
+		if err == nil && len(channels) == 0 {
+			if err := editorService.LoadDefaults(); err != nil {
+				log.Printf("Warning: failed to load default channels: %v", err)
+			}
+		}
+	}
+
 	// Initialize Handlers with services
 	mediaHandler := handlers.NewMediaHandler(mediaService)
 	editorHandler := handlers.NewEditorHandler(editorService)
