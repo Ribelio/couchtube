@@ -28,7 +28,6 @@ services:
       - "8363:8363"  
     environment:
       - PORT=8363
-      - READONLY_MODE=false
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8363"]
@@ -45,7 +44,6 @@ docker run -d \
   --name couchtube_app \
   -p 8363:8363 \
   -e PORT=8363 \
-  -e READONLY_MODE=false \
   --restart unless-stopped \
   --health-cmd="curl -f http://localhost:8363 || exit 1" \
   --health-interval=30s \
@@ -62,7 +60,6 @@ Ensure you have Golang 1.22 or higher installed. Create a `.env` file with the s
 ```dotenv
 PORT=8363
 DATABASE_FILE_PATH=/app/data/couchtube.db
-READONLY_MODE=false
 ```
 
 1. **Clone the Repository**:
@@ -100,11 +97,10 @@ You can configure CouchTube using environment variables.
 
 | Variable             | Description                                                                 |
 | -------------------- | --------------------------------------------------------------------------- |
-| `PORT`               | The port number on which CouchTube will run.                                |
-| `DATABASE_FILE_PATH` | The path to the SQLite database file used by CouchTube.                     |
-| `JSON_FILE_PATH`     | The path to the JSON file used by CouchTube.                                |
-| `FULL_SCAN`          | Overwrites the existing data in the DB with the videos in JSON file.        |
-| `READONLY_MODE`      | If set to `true`, CouchTube will run in read-only mode, preventing changes. |
+| `PORT`                   | The port number on which CouchTube will run.                                    |
+| `DATABASE_FILE_PATH`     | The path to the SQLite database file used by CouchTube.                         |
+| `DEFAULT_CHANNELS_PATH`  | Path to the JSON file used to seed the database on first run. Default: `/videos.json`. |
+| `EDITOR_MODE`            | If set to `true`, enables the channel editor at `/editor`.                      |
 
 
 ### Custom JSON Format for Channel and Video Lists
@@ -162,6 +158,10 @@ Save your custom JSON file using the above structure or make it accessible throu
 ### Uploading Custom JSON
 
 Within the CouchTube application, click the settings icon (gear icon) to submit a URL pointing to your custom JSON file. This URL should contain the JSON with channels and videos you want CouchTube to use.
+
+### Channel Editor
+
+CouchTube includes a built-in editor at `/editor` for managing channels and videos directly in the browser. You can add, edit, and delete channels and videos, as well as import/export your configuration as JSON.
 
 ---
 

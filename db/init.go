@@ -2,20 +2,120 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
-	"github.com/ozencb/couchtube/config"
-	"github.com/ozencb/couchtube/helpers"
-	jsonmodels "github.com/ozencb/couchtube/models/json"
 	_ "modernc.org/sqlite"
 )
 
-func createTables(db *sql.DB) error {
-	createVideosTableQuery := `CREATE TABLE IF NOT EXISTS videos (
-		"id" TEXT NOT NULL PRIMARY KEY,		
+func columnExists(db *sql.DB, table, column string) bool {
+	rows, err := db.Query("PRAGMA table_info(" + table + ")")
+	if err != nil {
+		return false
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var cid int
+		var name, ctype string
+		var notnull int
+		var dfltValue sql.NullString
+		var pk int
+		if err := rows.Scan(&cid, &name, &ctype, &notnull, &dfltValue, &pk); err != nil {
+			return false
+		}
+		if name == column {
+			return true
+		}
+	}
+	return false
+}
+
+func tableExists(db *sql.DB, table string) bool {
+	var name string
+	err := db.QueryRow("SELECT name FROM sqlite_master WHERE type='table' AND name=?", table).Scan(&name)
+	return err == nil
+}
+
+func migrateSchema(db *sql.DB) error {
+	if !tableExists(db, "channel_videos") {
+		return nil
+	}
+	if columnExists(db, "channel_videos", "section_start") {
+		return nil
+	}
+	if !columnExists(db, "videos", "section_start") {
+		return nil
+	}
+
+	log.Println("Migrating schema: moving section times from videos to channel_videos...")
+
+	if tableExists(db, "channel_videos_new") {
+		db.Exec("DROP TABLE channel_videos_new")
+	}
+	if tableExists(db, "videos_new") && !tableExists(db, "videos") {
+		db.Exec("ALTER TABLE videos_new RENAME TO videos")
+		log.Println("Schema migration recovered from partial state.")
+		return nil
+	}
+	if tableExists(db, "videos_new") && tableExists(db, "videos") {
+		db.Exec("DROP TABLE videos_new")
+	}
+
+	_, err := db.Exec(`CREATE TABLE channel_videos_new (
+		"channel_id" INTEGER NOT NULL,
+		"video_id" TEXT NOT NULL,
 		"section_start" INTEGER NOT NULL,
 		"section_end" INTEGER NOT NULL,
+		"position" INTEGER NOT NULL DEFAULT 0,
+		FOREIGN KEY(channel_id) REFERENCES channels(id) ON DELETE CASCADE,
+		FOREIGN KEY(video_id) REFERENCES videos(id),
+		UNIQUE(channel_id, video_id),
 		CHECK (section_end > section_start)
+	)`)
+	if err != nil {
+		return fmt.Errorf("create channel_videos_new: %w", err)
+	}
+
+	_, err = db.Exec(`INSERT INTO channel_videos_new (channel_id, video_id, section_start, section_end, position)
+		SELECT cv.channel_id, cv.video_id, v.section_start, v.section_end,
+			(SELECT COUNT(*) FROM channel_videos cv2
+			 WHERE cv2.channel_id = cv.channel_id AND cv2.rowid < cv.rowid) as pos
+		FROM channel_videos cv
+		JOIN videos v ON cv.video_id = v.id`)
+	if err != nil {
+		db.Exec("DROP TABLE channel_videos_new")
+		return fmt.Errorf("copy channel_videos data: %w", err)
+	}
+
+	if _, err = db.Exec("DROP TABLE channel_videos"); err != nil {
+		return fmt.Errorf("drop old channel_videos: %w", err)
+	}
+	if _, err = db.Exec("ALTER TABLE channel_videos_new RENAME TO channel_videos"); err != nil {
+		return fmt.Errorf("rename channel_videos_new: %w", err)
+	}
+
+	if _, err = db.Exec(`CREATE TABLE videos_new ("id" TEXT NOT NULL PRIMARY KEY)`); err != nil {
+		return fmt.Errorf("create videos_new: %w", err)
+	}
+	if _, err = db.Exec(`INSERT INTO videos_new (id) SELECT id FROM videos`); err != nil {
+		db.Exec("DROP TABLE videos_new")
+		return fmt.Errorf("copy videos data: %w", err)
+	}
+	if _, err = db.Exec("DROP TABLE videos"); err != nil {
+		return fmt.Errorf("drop old videos: %w", err)
+	}
+	if _, err = db.Exec("ALTER TABLE videos_new RENAME TO videos"); err != nil {
+		return fmt.Errorf("rename videos_new: %w", err)
+	}
+
+	db.Exec("CREATE INDEX IF NOT EXISTS idx_videos_channel_id ON channel_videos(channel_id, video_id)")
+	log.Println("Schema migration completed successfully.")
+	return nil
+}
+
+func createTables(db *sql.DB) error {
+	createVideosTableQuery := `CREATE TABLE IF NOT EXISTS videos (
+		"id" TEXT NOT NULL PRIMARY KEY
 	);`
 	createChannelsTableQuery := `CREATE TABLE IF NOT EXISTS channels (
 		"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -25,9 +125,13 @@ func createTables(db *sql.DB) error {
 	createChannelVideosTableQuery := `CREATE TABLE IF NOT EXISTS channel_videos (
 		"channel_id" INTEGER NOT NULL,
 		"video_id" TEXT NOT NULL,
+		"section_start" INTEGER NOT NULL,
+		"section_end" INTEGER NOT NULL,
+		"position" INTEGER NOT NULL DEFAULT 0,
 		FOREIGN KEY(channel_id) REFERENCES channels(id) ON DELETE CASCADE,
-		FOREIGN KEY(video_id) REFERENCES videos(id) ON DELETE CASCADE,
-		UNIQUE(channel_id, video_id)
+		FOREIGN KEY(video_id) REFERENCES videos(id),
+		UNIQUE(channel_id, video_id),
+		CHECK (section_end > section_start)
 	);`
 	createIndexesQuery := `CREATE INDEX IF NOT EXISTS idx_videos_channel_id ON channel_videos(channel_id, video_id);`
 
@@ -41,136 +145,12 @@ func createTables(db *sql.DB) error {
 	return nil
 }
 
-func populateDatabase(db *sql.DB) error {
-	// Parse the JSON file and insert data into the database, if channels are not defined.
-	jsonFilePath := config.GetJSONFilePath()
-	channels, err := helpers.LoadJSONFromFile[jsonmodels.ChannelsJson](jsonFilePath)
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-
-	// Check if any channels already exist to avoid re-population.
-	var exists int
-
-	if !config.GetFullScan() {
-		err = db.QueryRow(`SELECT EXISTS(SELECT 1 FROM channels LIMIT 1);`).Scan(&exists)
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-	} else {
-		// If full scan is enabled, delete all data from the tables.
-		// also reset id sequence for all tables,
-		log.Println("Full scan enabled. Deleting all data from the database.")
-		_, err = db.Exec(`DELETE FROM channels;
-					      DELETE FROM videos;
-						  DELETE FROM channel_videos;
-						  DELETE FROM sqlite_sequence WHERE name IN ('channels', 'videos', 'channel_videos');
-						  VACUUM;
-						  `)
-
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-	}
-
-	if exists == 1 {
-		log.Println("Data already exists in the database. Skipping population.")
-		return nil
-	}
-
-	return WithTransaction(db, func(tx *sql.Tx) error {
-		insertChannelQuery := `INSERT OR IGNORE INTO channels (name) VALUES (?)`
-		insertVideoQuery := `INSERT OR IGNORE INTO videos (id, section_start, section_end) VALUES (?, ?, ?)`
-		insertChannelVideoQuery := `INSERT OR IGNORE INTO channel_videos (channel_id, video_id) VALUES (?, ?)`
-
-		for _, channel := range channels.Channels {
-			if len(channel.Videos) == 0 {
-				log.Printf("Channel %s has no videos. Skipping.\n", channel.Name)
-				continue
-			}
-
-			channelID, err := insertOrGetChannelID(tx, channel.Name, insertChannelQuery)
-			if err != nil {
-				return err
-			}
-
-			for _, video := range channel.Videos {
-				videoID, err := insertOrGetVideoID(tx, video, insertVideoQuery)
-				if err != nil {
-					return err
-				}
-
-				// Insert channel-video relationship
-				_, err = tx.Exec(insertChannelVideoQuery, channelID, videoID)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		log.Println("Data inserted successfully.")
-		return nil
-	})
-}
-
-func insertOrGetChannelID(tx *sql.Tx, name, query string) (int64, error) {
-	result, err := tx.Exec(query, name)
-	if err != nil {
-		return 0, err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return 0, err
-	}
-
-	if rowsAffected > 0 {
-		return result.LastInsertId()
-	}
-
-	var existingID int64
-	getIDQuery := `SELECT id FROM channels WHERE name = ?`
-	err = tx.QueryRow(getIDQuery, name).Scan(&existingID)
-	if err != nil {
-		return 0, err
-	}
-
-	return existingID, nil
-}
-
-func insertOrGetVideoID(tx *sql.Tx, video jsonmodels.VideoJson, query string) (string, error) {
-	result, err := tx.Exec(query, video.Id, video.SectionStart, video.SectionEnd)
-	if err != nil {
-		return "", err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return "", err
-	}
-
-	if rowsAffected > 0 {
-		return video.Id, nil
-	}
-
-	var existingID string
-	getIDQuery := `SELECT id FROM videos WHERE id = ?`
-	err = tx.QueryRow(getIDQuery, video.Id).Scan(&existingID)
-	if err != nil {
-		return "", err
-	}
-
-	return existingID, nil
-}
 
 func InitDatabase(db *sql.DB) {
+	if err := migrateSchema(db); err != nil {
+		log.Fatal("Failed to migrate schema:", err)
+	}
 	if err := createTables(db); err != nil {
 		log.Fatal("Failed to create tables:", err)
-	}
-	if err := populateDatabase(db); err != nil {
-		log.Println("Database already populated or error occurred:", err)
 	}
 }

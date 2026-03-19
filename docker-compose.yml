@@ -7,9 +7,7 @@ services:
     environment:
       - PORT=8363
       - DATABASE_FILE_PATH=/app/data/couchtube.db
-      - JSON_FILE_PATH=/data/videos.json
-      - READONLY_MODE=false
-      - FULL_SCAN=true
+      - DEFAULT_CHANNELS_PATH=/data/videos.json
     volumes:
       - couchtube_db:/app/data
       - ./videos.json:/app/data/videos.json:ro

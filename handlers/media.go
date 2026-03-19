@@ -58,12 +58,7 @@ func (h *Media) GetCurrentVideo(w http.ResponseWriter, r *http.Request) {
 	var video *dbmodels.Video
 	// if videoId is provided, call FetchNextVideo
 	if videoID != "" {
-		videoIDInt, err := strconv.Atoi(videoID)
-		if err != nil {
-			http.Error(w, "Invalid video-id", http.StatusBadRequest)
-			return
-		}
-		video = h.Service.FetchNextVideo(channelIDInt, videoIDInt)
+		video = h.Service.FetchNextVideo(channelIDInt, videoID)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]interface{}{"video": video})
@@ -72,7 +67,7 @@ func (h *Media) GetCurrentVideo(w http.ResponseWriter, r *http.Request) {
 		// if videoId is not provided, call GetCurrentVideoByChannelId
 		video, err = h.Service.GetCurrentVideoByChannelId(channelIDInt)
 		if err != nil {
-			println(err.Error())
+			log.Println(err)
 			http.Error(w, "Failed to load video", http.StatusInternalServerError)
 			return
 		}

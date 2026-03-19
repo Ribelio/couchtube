@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/ozencb/couchtube/config"
 	"github.com/ozencb/couchtube/db"
@@ -14,17 +15,17 @@ import (
 )
 
 type Route struct {
-	Path     string
-	Handler  http.HandlerFunc
-	Readonly bool
+	Path       string
+	Handler    http.HandlerFunc
+	EditorOnly bool
 }
 
-func registerRoutes(mux *http.ServeMux, routes []Route) {
+func registerRoutes(mux *http.ServeMux, routes []Route, editorGuard func(http.HandlerFunc) http.HandlerFunc) {
 	for _, route := range routes {
 		handler := route.Handler
 
-		if route.Readonly {
-			handler = middleware.ReadOnlyGuard(handler)
+		if route.EditorOnly {
+			handler = editorGuard(handler)
 		}
 
 		mux.Handle(route.Path, handler)
@@ -48,21 +49,52 @@ func main() {
 
 	// Initialize Services
 	mediaService := services.NewMediaService(txManager, channelRepo, videoRepo)
+	editorService := services.NewEditorService(txManager, channelRepo, videoRepo)
 
 	// Initialize Handlers with services
 	mediaHandler := handlers.NewMediaHandler(mediaService)
+	editorHandler := handlers.NewEditorHandler(editorService)
 
-	readonlyEnabled := config.GetReadonlyMode()
+	var editorGuard func(http.HandlerFunc) http.HandlerFunc
+	if config.GetEditorMode() {
+		editorGuard = middleware.EditorGuardEnabled
+	} else {
+		editorGuard = middleware.EditorGuard
+	}
+
+	staticFs := http.FileServer(http.Dir("./static"))
+	rootHandler := staticFs.ServeHTTP
+	if !config.GetEditorMode() {
+		rootHandler = func(w http.ResponseWriter, r *http.Request) {
+			if strings.HasPrefix(r.URL.Path, "/editor") {
+				http.NotFound(w, r)
+				return
+			}
+			staticFs.ServeHTTP(w, r)
+		}
+	}
 
 	routes := []Route{
-		{Path: "/", Handler: http.FileServer(http.Dir("./static")).ServeHTTP, Readonly: false},
-		{Path: "/api/channels", Handler: mediaHandler.FetchAllChannels, Readonly: false},
-		{Path: "/api/current-video", Handler: mediaHandler.GetCurrentVideo, Readonly: false},
-		{Path: "/api/submit-list", Handler: mediaHandler.SubmitList, Readonly: readonlyEnabled},
-		{Path: "/api/invalidate-video", Handler: mediaHandler.InvalidateVideo, Readonly: readonlyEnabled},
-		{Path: "/api/config", Handler: handlers.GetConfigs, Readonly: false},
+		{Path: "/", Handler: rootHandler},
+		{Path: "/api/channels", Handler: mediaHandler.FetchAllChannels},
+		{Path: "/api/current-video", Handler: mediaHandler.GetCurrentVideo},
+		{Path: "/api/submit-list", Handler: mediaHandler.SubmitList},
+		{Path: "/api/invalidate-video", Handler: mediaHandler.InvalidateVideo},
+		{Path: "/api/config", Handler: handlers.GetConfigs},
+		{Path: "/api/load-defaults", Handler: editorHandler.LoadDefaults},
+		{Path: "/api/editor/channels", Handler: editorHandler.HandleChannels, EditorOnly: true},
+		{Path: "/api/editor/channels/videos", Handler: editorHandler.HandleVideos, EditorOnly: true},
+		{Path: "/api/editor/channels/videos/reorder", Handler: editorHandler.ReorderVideos, EditorOnly: true},
+		{Path: "/api/editor/export", Handler: editorHandler.ExportJSON, EditorOnly: true},
+		{Path: "/api/editor/import", Handler: editorHandler.ImportJSON, EditorOnly: true},
+		{Path: "/api/editor/import-playlist", Handler: editorHandler.ImportPlaylist, EditorOnly: true},
 	}
-	registerRoutes(http.DefaultServeMux, routes)
+	registerRoutes(http.DefaultServeMux, routes, editorGuard)
+
+	if config.GetEditorMode() {
+		editorFs := handlers.ServeEditor()
+		http.DefaultServeMux.Handle("/editor/", editorFs)
+	}
 
 	port := config.GetPort()
 

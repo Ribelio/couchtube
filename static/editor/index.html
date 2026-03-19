@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/editor/editor.css" />
+    <title>CouchTube Editor</title>
+</head>
+<body>
+    <div id="app">
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <span class="sidebar-title">Channels</span>
+                <button id="btn-new-channel" class="btn btn-primary btn-sm">+ New</button>
+            </div>
+            <div id="channel-list"></div>
+            <div id="sidebar-footer">
+                <button id="btn-import" class="btn btn-secondary btn-sm">Import JSON</button>
+                <button id="btn-export" class="btn btn-secondary btn-sm">Export JSON</button>
+                <input type="file" id="import-file-input" accept=".json" style="display:none" />
+                <a href="/" class="btn btn-secondary btn-sm" id="btn-home">Back to TV</a>
+            </div>
+        </div>
+        <div id="main-panel">
+            <div id="empty-state">
+                <p>Select a channel or create a new one</p>
+            </div>
+            <div id="channel-editor" style="display:none">
+                <div id="channel-header">
+                    <div id="channel-name-row">
+                        <input type="text" id="channel-name-input" />
+                        <button id="btn-save-name" class="btn btn-success btn-sm">Save</button>
+                    </div>
+                    <button id="btn-delete-channel" class="btn btn-danger btn-sm">Delete Channel</button>
+                </div>
+                <div id="add-video-bar">
+                    <input type="text" id="add-video-input" placeholder="Paste YouTube URL or video ID..." />
+                    <button id="btn-add-video" class="btn btn-primary btn-sm">Add</button>
+                    <span id="add-video-status" style="display:none; font-size:12px; color:#888;"></span>
+                </div>
+                <div id="hidden-player-host" style="position:absolute; width:1px; height:1px; overflow:hidden; left:-9999px;"></div>
+                <div id="video-list"></div>
+                <div id="playlist-import-bar">
+                    <input type="text" id="playlist-url-input" placeholder="Paste YouTube playlist URL to bulk-import..." />
+                    <button id="btn-import-playlist" class="btn btn-accent btn-sm">Import Playlist</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="playlist-modal" class="modal-overlay" style="display:none">
+        <div class="modal">
+            <div class="modal-header">
+                <span>Import Playlist Videos</span>
+                <button id="btn-close-playlist-modal" class="btn-close">&times;</button>
+            </div>
+            <div id="playlist-modal-body"></div>
+            <div class="modal-footer">
+                <button id="btn-confirm-playlist" class="btn btn-primary">Add Selected</button>
+            </div>
+        </div>
+    </div>
+    <div id="preview-modal" class="modal-overlay" style="display:none">
+        <div class="modal modal-preview">
+            <div class="modal-header">
+                <span>Preview</span>
+                <button id="btn-close-preview" class="btn-close">&times;</button>
+            </div>
+            <div id="preview-player-container">
+                <div id="preview-player"></div>
+            </div>
+            <div class="preview-controls">
+                <div class="mark-row">
+                    <span class="mark-time" id="mark-start-time">--:--</span>
+                    <button id="btn-mark-start" class="btn btn-success btn-sm">Mark Start</button>
+                </div>
+                <div class="mark-row">
+                    <span class="mark-time" id="mark-end-time">--:--</span>
+                    <button id="btn-mark-end" class="btn btn-danger btn-sm">Mark End</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="/editor/editor.js"></script>
+</body>
+</html>

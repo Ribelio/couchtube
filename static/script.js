@@ -3,8 +3,8 @@ const IFRAME_API_URL = 'https://www.youtube.com/iframe_api';
 const BUFFERING_TIMEOUT = 3500;
 const CHANNELS_ENDPOINT = '/api/channels';
 const CURRENT_VIDEO_ENDPOINT = '/api/current-video';
-const SUBMIT_VIDEO_ENDPOINT = '/api/submit-list';
 const INVALIDATE_VIDEO_ENDPOINT = '/api/invalidate-video';
+const LOAD_DEFAULTS_ENDPOINT = '/api/load-defaults';
 const VOLUME_STEPS = 5;
 const VOLUME_BAR_TIMEOUT = 2000;
 const CHANNEL_NAME_TIMEOUT = 3000;
@@ -231,48 +231,37 @@ const togglePlayPause = (player, isPlaying) => {
   return !isPlaying;
 };
 
+const cueVideo = (state, video) => {
+  const { player } = state;
+  const videoId = video.id;
+  if (!videoId) return;
+  const shouldUnmute = state.isInteracted && !state.isMuted;
+  player.cueVideoById({ videoId, startSeconds: video.sectionStart });
+  player.mute();
+  player.playVideo();
+  if (shouldUnmute) {
+    player.unMute();
+    state.isMuted = false;
+  }
+};
+
 // Switch to the next or previous channel
 const changeChannel = async (state, offset) => {
-  const { player, channels, currentChannel } = state;
+  const { channels, currentChannel } = state;
   const currentIndex = channels.findIndex(
     (channel) => channel.id === currentChannel.id
   );
   const newIndex = (currentIndex + offset + channels.length) % channels.length;
   const newChannel = channels[newIndex];
   const newVideo = await fetchCurrentVideo(newChannel.id);
-  if (newVideo) {
-    const videoId = newVideo.id;
-    if (videoId) {
-      const shouldUnmute = state.isInteracted && !state.isMuted;
-      player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
-      player.mute();
-      player.playVideo();
-      if (shouldUnmute) {
-        player.unMute();
-        state.isMuted = false;
-      }
-    }
-  }
+  if (newVideo) cueVideo(state, newVideo);
   return { newChannel, newVideo };
 };
 
 const jumpToChannel = async (state, channelId) => {
-  const { player, channels } = state;
-  const newChannel = channels.find((channel) => channel.id === channelId);
+  const newChannel = state.channels.find((channel) => channel.id === channelId);
   const newVideo = await fetchCurrentVideo(newChannel.id);
-  if (newVideo) {
-    const videoId = newVideo.id;
-    if (videoId) {
-      const shouldUnmute = state.isInteracted && !state.isMuted;
-      player.cueVideoById({ videoId, startSeconds: newVideo.sectionStart });
-      player.mute();
-      player.playVideo();
-      if (shouldUnmute) {
-        player.unMute();
-        state.isMuted = false;
-      }
-    }
-  }
+  if (newVideo) cueVideo(state, newVideo);
   return { newChannel, newVideo };
 };
 
@@ -284,51 +273,6 @@ const closeInfoModal = () => {
 const toggleInfoModal = () => {
   const infoPopup = document.querySelector('#info-modal-container');
   infoPopup.classList.toggle('active');
-
-  infoPopup.addEventListener('click', (event) => {
-    if (event.target === infoPopup) {
-      closeInfoModal();
-    }
-  });
-};
-
-const closeSettingsModal = () => {
-  const settingsPopup = document.querySelector('#settings-modal-container');
-  settingsPopup.classList.remove('active');
-};
-
-const toggleSettingsModal = () => {
-  const settingsPopup = document.querySelector('#settings-modal-container');
-  settingsPopup.classList.toggle('active');
-
-  settingsPopup.addEventListener('click', (event) => {
-    if (event.target === settingsPopup) {
-      closeSettingsModal();
-    }
-  });
-};
-
-const submitVideoLink = async () => {
-  const videoListInput = document.querySelector('#video-list-input');
-  const videoListUrl = videoListInput.value;
-
-  console.log(videoListUrl);
-
-  const res = await fetch(SUBMIT_VIDEO_ENDPOINT, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ videoListUrl })
-  });
-  const data = await res.json();
-  if (data.success) {
-    console.log('Video list submitted successfully');
-
-    videoListInput.value = '';
-    closeSettingsModal();
-    location.reload();
-  }
 };
 
 const fetchConfig = async () => {
@@ -342,23 +286,6 @@ const fetchConfig = async () => {
   }
 };
 
-const updateUIForReadOnlyMode = (state) => {
-  submitButton = document.querySelector('#video-list-submit');
-  videoListInput = document.querySelector('#video-list-input');
-  if (state.readonly) {
-    submitButton.disabled = true;
-    submitButton.style.opacity = '0.5';
-    videoListInput.disabled = true;
-    videoListInput.style.opacity = '0.5';
-    videoListInput.placeholder = 'Application is in readonly mode';
-  } else {
-    submitButton.disabled = false;
-    submitButton.style.opacity = '1';
-    videoListInput.disabled = false;
-    videoListInput.style.opacity = '1';
-    videoListInput.placeholder = 'Enter video list URL';
-  }
-};
 
 const displayMessage = (message, title = ' ') => {
   const messageModal = document.querySelector('#message-modal');
@@ -372,6 +299,33 @@ const displayMessage = (message, title = ' ') => {
   messageContent.innerHTML = message;
 
   messageModal.classList.add('active');
+};
+
+const showWelcomePopup = (editorMode) => {
+  const container = document.querySelector('#welcome-modal-container');
+  container.classList.add('active');
+
+  document.querySelector('#welcome-load-defaults').addEventListener('click', async () => {
+    const btn = document.querySelector('#welcome-load-defaults');
+    btn.disabled = true;
+    btn.textContent = 'Loading...';
+    const res = await fetch(LOAD_DEFAULTS_ENDPOINT, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      location.reload();
+    }
+  });
+
+  const editorBtn = document.querySelector('#welcome-go-editor');
+  const editorNote = document.querySelector('#welcome-editor-note');
+  if (editorMode) {
+    editorBtn.addEventListener('click', () => {
+      window.location.href = '/editor/';
+    });
+  } else {
+    editorBtn.disabled = true;
+    editorNote.style.display = 'block';
+  }
 };
 
 const closeMessageModal = () => {
@@ -428,7 +382,7 @@ const addEventListeners = (state) => {
       toggleInfoModal();
     },
     settings: () => {
-      toggleSettingsModal();
+      window.location.href = '/editor/';
     }
   };
 
@@ -449,12 +403,6 @@ const addEventListeners = (state) => {
     });
 
   document
-    .querySelector('#settings-modal-close-button')
-    .addEventListener('click', () => {
-      closeSettingsModal();
-    });
-
-  document
     .querySelector('#message-modal-close-button')
     .addEventListener('click', () => {
       closeMessageModal();
@@ -464,8 +412,8 @@ const addEventListeners = (state) => {
     window.open(YOUTUBE_BASE_VIDEO_URL + state.currentVideo.id, '_blank');
   });
 
-  document.querySelector('#video-list-submit').addEventListener('click', () => {
-    submitVideoLink();
+  document.querySelector('#info-modal-container').addEventListener('click', (event) => {
+    if (event.target === event.currentTarget) closeInfoModal();
   });
 
   document.addEventListener('keydown', (event) => {
@@ -528,7 +476,15 @@ const initApp = async (playerElementId) => {
   const channels = await fetchChannels();
 
   if (channels.length === 0) {
-    displayMessage('No channels available.');
+    const config = await fetchConfig();
+    if (config?.editorMode) {
+      const settingsBtn = document.querySelector('#control-settings');
+      settingsBtn.style.display = '';
+      settingsBtn.addEventListener('click', () => {
+        window.location.href = '/editor/';
+      });
+    }
+    showWelcomePopup(config?.editorMode);
     return;
   }
 
@@ -545,13 +501,15 @@ const initApp = async (playerElementId) => {
     channels,
     isInteracted: false,
     currentVideoName: '',
-    readonly: false
+    videoCheckIntervalId: null,
   };
 
   addEventListeners(state);
   fetchConfig().then((config) => {
-    state.readonly = config.readonly;
-    updateUIForReadOnlyMode(state);
+    state.editorMode = config.editorMode;
+    if (config.editorMode) {
+      document.querySelector('#control-settings').style.display = '';
+    }
   });
 
   const onReady = async () => {
@@ -587,14 +545,18 @@ const initApp = async (playerElementId) => {
     ) {
       deactiveBuffering(state);
 
-      const intervalId = setInterval(async () => {
+      if (state.videoCheckIntervalId) {
+        clearInterval(state.videoCheckIntervalId);
+      }
+      state.videoCheckIntervalId = setInterval(async () => {
         const currentTime = state.player.getCurrentTime();
 
         if (
           currentTime >= state.currentVideo.sectionEnd ||
           data === YT.PlayerState.ENDED
         ) {
-          clearInterval(intervalId);
+          clearInterval(state.videoCheckIntervalId);
+          state.videoCheckIntervalId = null;
           const { newChannel, newVideo } = await changeChannel(state, 0);
           state.currentChannel = newChannel;
           state.currentVideo = newVideo;

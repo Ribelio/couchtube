@@ -21,6 +21,4 @@ concurrency = { hard_limit = 1, soft_limit = 1 }
   memory_mb = 256
 
 [env]
-  FULL_SCAN = "false"
-  READONLY_MODE = "true"
-  JSON_FILE_PATH = "/data/videos.json"
+  DEFAULT_CHANNELS_PATH = "/data/videos.json"

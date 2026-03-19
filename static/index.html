@@ -1,140 +1,190 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link
-      rel="icon"
-      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>"
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-    <title>Couchtube</title>
-  </head>
-  <body>
-    <div id="transparent-overlay"></div>
-    <div class="player-wrapper">
-      <img src="/assets/static.gif" id="buffer-gif" class="buffer-gif active" />
-      <div id="channel-name">Couchtube 00</div>
-      <div id="player"></div>
-      <div id="controls">
-        <div class="control-group top-controls">
-          <button id="control-power">
-            <img class="control-icon" src="/assets/icons/power.svg" />
-          </button>
-          <button id="control-info">
-            <img class="control-icon" src="/assets/icons/info.svg" />
-          </button>
-          <button id="control-mute">
+    <head>
+        <meta charset="UTF-8" />
+        <link
+            rel="icon"
+            href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📺</text></svg>"
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="style.css" />
+        <title>Couchtube</title>
+    </head>
+    <body>
+        <div id="transparent-overlay"></div>
+        <div class="player-wrapper">
             <img
-              class="control-icon red"
-              src="/assets/icons/volume_muted.svg"
+                src="/assets/static.gif"
+                id="buffer-gif"
+                class="buffer-gif active"
             />
-          </button>
-        </div>
-        <div class="control-group channel-controls">
-          <button id="control-chup">
-            <img class="control-icon" src="/assets/icons/chevron_up.svg" />
-          </button>
-          <button id="control-chdown">
-            <img class="control-icon" src="/assets/icons/chevron_down.svg" />
-          </button>
-        </div>
-        <div class="control-group volume-controls">
-          <button id="control-volup">
-            <img class="control-icon" src="/assets/icons/volume_add.svg" />
-          </button>
-          <button id="control-voldown">
-            <img class="control-icon" src="/assets/icons/volume_minus.svg" />
-          </button>
-        </div>
-        <div class="control-group bottom-controls">
-          <button id="control-fullscreen">
-            <img class="control-icon" src="/assets/icons/fullscreen.svg" />
-          </button>
-          <button id="control-settings">
-            <img class="control-icon" src="/assets/icons/settings.svg" />
-          </button>
-          <button id="control-minimize">
-            <img class="control-icon" src="/assets/icons/contract.svg" />
-          </button>
-        </div>
-      </div>
+            <div id="channel-name">Couchtube 00</div>
+            <div id="player"></div>
+            <div id="controls">
+                <div class="control-group top-controls">
+                    <button id="control-power">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/power.svg"
+                        />
+                    </button>
+                    <button id="control-info">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/info.svg"
+                        />
+                    </button>
+                    <button id="control-mute">
+                        <img
+                            class="control-icon red"
+                            src="/assets/icons/volume_muted.svg"
+                        />
+                    </button>
+                </div>
+                <div class="control-group channel-controls">
+                    <button id="control-chup">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/chevron_up.svg"
+                        />
+                    </button>
+                    <button id="control-chdown">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/chevron_down.svg"
+                        />
+                    </button>
+                </div>
+                <div class="control-group volume-controls">
+                    <button id="control-volup">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/volume_add.svg"
+                        />
+                    </button>
+                    <button id="control-voldown">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/volume_minus.svg"
+                        />
+                    </button>
+                </div>
+                <div class="control-group bottom-controls">
+                    <button id="control-fullscreen">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/fullscreen.svg"
+                        />
+                    </button>
+                    <button id="control-settings" style="display: none">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/settings.svg"
+                        />
+                    </button>
+                    <button id="control-minimize">
+                        <img
+                            class="control-icon"
+                            src="/assets/icons/contract.svg"
+                        />
+                    </button>
+                </div>
+            </div>
 
-      <div id="volume-bar"></div>
-    </div>
-
-    <div id="info-modal-container" class="modal-container">
-      <div id="info-modal" class="modal-body">
-        <div id="info-modal-title" class="modal-title">
-          <div>Info</div>
-          <div id="info-modal-close-button" class="modal-close-button">
-            <img src="/assets/icons/cross.svg" />
-          </div>
-        </div>
-
-        <div class="modal-content">
-          <div id="video-link">
-            <div id="video-link-title"></div>
-            <img src="/assets/icons/external.svg" />
-          </div>
-          <div>Channels</div>
-          <div id="channel-list"></div>
-
-          <a
-            class="source-link"
-            href="https://github.com/ozencb/couchtube"
-            target="_blank"
-          >
-            <img src="/assets/icons/git.svg" />
-            <span>Source Code</span>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <div id="settings-modal-container" class="modal-container">
-      <div id="settings-modal" class="modal-body">
-        <div id="settings-modal-title" class="modal-title">
-          <div>Settings</div>
-          <div id="settings-modal-close-button" class="modal-close-button">
-            <img src="/assets/icons/cross.svg" />
-          </div>
-        </div>
-
-        <div class="modal-content">
-          <div class="">Provide Your Own Videos</div>
-          <input
-            type="text"
-            id="video-list-input"
-            placeholder="Application is in readonly mode"
-            disabled
-          />
-          <button id="video-list-submit" disabled>Submit</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="message-modal" class="modal-container">
-      <div id="message-modal-body" class="modal-body">
-        <div id="message-modal-title" class="modal-title">
-          <div id="message-modal-title-content">Message</div>
-          <div id="message-modal-close-button" class="modal-close-button">
-            <img src="/assets/icons/cross.svg" />
-          </div>
+            <div id="volume-bar"></div>
         </div>
 
-        <div class="modal-content">
-          <div id="message-modal-content"></div>
-        </div>
-      </div>
-    </div>
+        <div id="info-modal-container" class="modal-container">
+            <div id="info-modal" class="modal-body">
+                <div id="info-modal-title" class="modal-title">
+                    <div>Info</div>
+                    <div
+                        id="info-modal-close-button"
+                        class="modal-close-button"
+                    >
+                        <img src="/assets/icons/cross.svg" />
+                    </div>
+                </div>
 
-    <script src="script.js"></script>
-  </body>
+                <div class="modal-content">
+                    <div id="video-link">
+                        <div id="video-link-title"></div>
+                        <img src="/assets/icons/external.svg" />
+                    </div>
+                    <div>Channels</div>
+                    <div id="channel-list"></div>
+
+                    <a
+                        class="source-link"
+                        href="https://github.com/ozencb/couchtube"
+                        target="_blank"
+                    >
+                        <img src="/assets/icons/git.svg" />
+                        <span>Source Code</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+<div id="welcome-modal-container" class="modal-container">
+            <div class="modal-body">
+                <div class="modal-title">
+                    <div>Welcome to Couchtube</div>
+                </div>
+                <div class="modal-content">
+                    <div>
+                        No videos defined yet. How would you like to get
+                        started?
+                    </div>
+                    <div class="welcome-buttons">
+                        <button
+                            id="welcome-load-defaults"
+                            class="welcome-button"
+                        >
+                            Load Default Videos
+                        </button>
+                        <button
+                            id="welcome-go-editor"
+                            class="welcome-button secondary"
+                        >
+                            Go to Editor
+                        </button>
+                        <div
+                            id="welcome-editor-note"
+                            class="welcome-note"
+                            style="display: none"
+                        >
+                            Editor mode is disabled.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="message-modal" class="modal-container">
+            <div id="message-modal-body" class="modal-body">
+                <div id="message-modal-title" class="modal-title">
+                    <div id="message-modal-title-content">Message</div>
+                    <div
+                        id="message-modal-close-button"
+                        class="modal-close-button"
+                    >
+                        <img src="/assets/icons/cross.svg" />
+                    </div>
+                </div>
+
+                <div class="modal-content">
+                    <div id="message-modal-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
 </html>

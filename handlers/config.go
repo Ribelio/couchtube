@@ -8,9 +8,9 @@ import (
 )
 
 func GetConfigs(w http.ResponseWriter, r *http.Request) {
-	readonlyEnabled := config.GetReadonlyMode()
+	editorEnabled := config.GetEditorMode()
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"readonly": ` + strconv.FormatBool(readonlyEnabled) + `}`))
+	w.Write([]byte(`{"editorMode": ` + strconv.FormatBool(editorEnabled) + `}`))
 }

@@ -2,13 +2,17 @@ package repo
 
 import (
 	"database/sql"
+	"fmt"
 
 	dbmodels "github.com/ozencb/couchtube/models/db"
 )
 
 type ChannelRepository interface {
 	FetchAllChannels() ([]dbmodels.Channel, error)
+	FetchAllChannelsWithVideos() ([]dbmodels.Channel, []dbmodels.Video, error)
 	InsertChannel(tx *sql.Tx, channelName string) (int, error)
+	RenameChannel(channelID int, name string) error
+	DeleteChannel(channelID int) error
 	DeleteAllChannels(tx *sql.Tx) error
 }
 
@@ -51,6 +55,50 @@ func (r *channelRepository) FetchAllChannels() ([]dbmodels.Channel, error) {
 	return channels, rows.Err()
 }
 
+func (r *channelRepository) FetchAllChannelsWithVideos() ([]dbmodels.Channel, []dbmodels.Video, error) {
+	channelRows, err := r.db.Query(`SELECT id, name FROM channels ORDER BY id`)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer channelRows.Close()
+
+	var channels []dbmodels.Channel
+	for channelRows.Next() {
+		var channel dbmodels.Channel
+		if err := channelRows.Scan(&channel.ID, &channel.Name); err != nil {
+			return nil, nil, err
+		}
+		channels = append(channels, channel)
+	}
+	if err := channelRows.Err(); err != nil {
+		return nil, nil, err
+	}
+
+	videoRows, err := r.db.Query(`
+		SELECT cv.channel_id, cv.video_id, cv.section_start, cv.section_end, cv.position
+		FROM channel_videos cv
+		ORDER BY cv.channel_id, cv.position
+	`)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer videoRows.Close()
+
+	var videos []dbmodels.Video
+	for videoRows.Next() {
+		var video dbmodels.Video
+		if err := videoRows.Scan(&video.ChannelID, &video.ID, &video.SectionStart, &video.SectionEnd, &video.Position); err != nil {
+			return nil, nil, err
+		}
+		videos = append(videos, video)
+	}
+	if err := videoRows.Err(); err != nil {
+		return nil, nil, err
+	}
+
+	return channels, videos, nil
+}
+
 func (r *channelRepository) InsertChannel(tx *sql.Tx, channelName string) (int, error) {
 	exec := r.db.Exec
 	if tx != nil {
@@ -64,6 +112,36 @@ func (r *channelRepository) InsertChannel(tx *sql.Tx, channelName string) (int, 
 
 	id, err := result.LastInsertId()
 	return int(id), err
+}
+
+func (r *channelRepository) RenameChannel(channelID int, name string) error {
+	result, err := r.db.Exec(`UPDATE channels SET name = ? WHERE id = ?`, name, channelID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("no channel found with id %d", channelID)
+	}
+	return nil
+}
+
+func (r *channelRepository) DeleteChannel(channelID int) error {
+	result, err := r.db.Exec(`DELETE FROM channels WHERE id = ?`, channelID)
+	if err != nil {
+		return err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return fmt.Errorf("no channel found with id %d", channelID)
+	}
+	return nil
 }
 
 func (r *channelRepository) DeleteAllChannels(tx *sql.Tx) error {

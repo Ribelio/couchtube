@@ -72,8 +72,8 @@ func (s *MediaService) GetCurrentVideoByChannelId(channelId int) (*dbmodels.Vide
 	return &videos[videoIndex], nil
 }
 
-func (s *MediaService) FetchNextVideo(channelId int, videoId int) *dbmodels.Video {
-	video, err := s.VideoRepo.FetchNextVideo(channelId, videoId)
+func (s *MediaService) FetchNextVideo(channelId int, videoId string) *dbmodels.Video {
+	video, err := s.VideoRepo.FetchNextVideo(videoId, channelId)
 	if err != nil {
 		return nil
 	}
@@ -95,7 +95,8 @@ func (s *MediaService) SubmitList(list jsonmodels.SubmitListRequestJson) (bool, 
 	}
 
 	// Fetch the video list from the provided URL
-	response, err := http.Get(videoListUrl)
+	client := &http.Client{Timeout: 10 * time.Second}
+	response, err := client.Get(videoListUrl)
 	if err != nil {
 		return false, err
 	}

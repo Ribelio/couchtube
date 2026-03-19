@@ -22,3 +22,6 @@ Godeps/
 
 # env
 .env
+
+# docs
+docs/

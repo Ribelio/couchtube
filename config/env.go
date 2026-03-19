@@ -10,12 +10,11 @@ import (
 )
 
 var (
-	port         string
-	dbFilePath   string
-	jsonFilePath string
-	fullScan     bool
-	readonly     bool
-	once         sync.Once
+	port                string
+	dbFilePath          string
+	defaultChannelsPath string
+	editorMode          bool
+	once                sync.Once
 )
 
 func init() {
@@ -26,9 +25,8 @@ func init() {
 
 		port = getEnv("PORT", "8363")
 		dbFilePath = getEnv("DATABASE_FILE_PATH", "couchtube.db")
-		jsonFilePath = getEnv("JSON_FILE_PATH", "/videos.json")
-		fullScan = getEnvAsBool("FULL_SCAN", false)
-		readonly = getEnvAsBool("READONLY_MODE", false)
+		defaultChannelsPath = getEnv("DEFAULT_CHANNELS_PATH", "/videos.json")
+		editorMode = getEnvAsBool("EDITOR_MODE", false)
 	})
 }
 
@@ -69,14 +67,10 @@ func GetDBFilePath() string {
 	return dbFilePath
 }
 
-func GetJSONFilePath() string {
-	return jsonFilePath
+func GetDefaultChannelsPath() string {
+	return defaultChannelsPath
 }
 
-func GetFullScan() bool {
-	return fullScan
-}
-
-func GetReadonlyMode() bool {
-	return readonly
+func GetEditorMode() bool {
+	return editorMode
 }
