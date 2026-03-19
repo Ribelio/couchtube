@@ -305,20 +305,24 @@ const showWelcomePopup = (editorMode) => {
   const container = document.querySelector('#welcome-modal-container');
   container.classList.add('active');
 
-  document.querySelector('#welcome-load-defaults').addEventListener('click', async () => {
-    const btn = document.querySelector('#welcome-load-defaults');
-    btn.disabled = true;
-    btn.textContent = 'Loading...';
-    const res = await fetch(LOAD_DEFAULTS_ENDPOINT, { method: 'POST' });
-    const data = await res.json();
-    if (data.success) {
-      location.reload();
-    }
-  });
+  const loadBtn = document.querySelector('#welcome-load-defaults');
+  if (editorMode === 'full') {
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.disabled = true;
+      loadBtn.textContent = 'Loading...';
+      const res = await fetch(LOAD_DEFAULTS_ENDPOINT, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        location.reload();
+      }
+    });
+  } else {
+    loadBtn.disabled = true;
+  }
 
   const editorBtn = document.querySelector('#welcome-go-editor');
   const editorNote = document.querySelector('#welcome-editor-note');
-  if (editorMode) {
+  if (editorMode !== 'off') {
     editorBtn.addEventListener('click', () => {
       window.location.href = '/editor/';
     });
@@ -477,14 +481,14 @@ const initApp = async (playerElementId) => {
 
   if (channels.length === 0) {
     const config = await fetchConfig();
-    if (config?.editorMode) {
+    if (config?.editorMode && config.editorMode !== 'off') {
       const settingsBtn = document.querySelector('#control-settings');
       settingsBtn.style.display = '';
       settingsBtn.addEventListener('click', () => {
         window.location.href = '/editor/';
       });
     }
-    showWelcomePopup(config?.editorMode);
+    showWelcomePopup(config?.editorMode || 'off');
     return;
   }
 
@@ -507,7 +511,7 @@ const initApp = async (playerElementId) => {
   addEventListeners(state);
   fetchConfig().then((config) => {
     state.editorMode = config.editorMode;
-    if (config.editorMode) {
+    if (config.editorMode && config.editorMode !== 'off') {
       document.querySelector('#control-settings').style.display = '';
     }
   });

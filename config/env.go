@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -13,7 +14,7 @@ var (
 	port                string
 	dbFilePath          string
 	defaultChannelsPath string
-	editorMode          bool
+	editorMode          string
 	once                sync.Once
 )
 
@@ -26,7 +27,7 @@ func init() {
 		port = getEnv("PORT", "8363")
 		dbFilePath = getEnv("DATABASE_FILE_PATH", "couchtube.db")
 		defaultChannelsPath = getEnv("DEFAULT_CHANNELS_PATH", "/videos.json")
-		editorMode = getEnvAsBool("EDITOR_MODE", false)
+		editorMode = getEnvAsEditorMode("EDITOR_MODE", "off")
 	})
 }
 
@@ -37,14 +38,23 @@ func getEnv(key, fallback string) string {
 	return fallback
 }
 
-func getEnvAsBool(key string, fallback bool) bool {
+func getEnvAsEditorMode(key string, fallback string) string {
 	if value, exists := os.LookupEnv(key); exists {
-		boolValue, err := strconv.ParseBool(value)
-		if err != nil {
-			log.Printf("Warning: unable to parse boolean from %s; using default: %v", key, fallback)
+		v := strings.ToLower(strings.TrimSpace(value))
+		switch v {
+		case "off", "readonly", "full":
+			return v
+		default:
+			boolValue, err := strconv.ParseBool(value)
+			if err == nil {
+				if boolValue {
+					return "full"
+				}
+				return "off"
+			}
+			log.Printf("Warning: unrecognized EDITOR_MODE value %q; using %q", value, fallback)
 			return fallback
 		}
-		return boolValue
 	}
 	return fallback
 }
@@ -71,6 +81,6 @@ func GetDefaultChannelsPath() string {
 	return defaultChannelsPath
 }
 
-func GetEditorMode() bool {
+func GetEditorMode() string {
 	return editorMode
 }

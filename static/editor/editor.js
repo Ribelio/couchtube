@@ -4,11 +4,17 @@ const videoListEl = document.getElementById("video-list");
 const emptyStateEl = document.getElementById("empty-state");
 const channelEditorEl = document.getElementById("channel-editor");
 const channelNameInput = document.getElementById("channel-name-input");
+let editorMode = 'full';
 
 async function init() {
+  try {
+    const config = await (await fetch('/api/config')).json();
+    editorMode = config.editorMode || 'readonly';
+  } catch (e) { editorMode = 'readonly'; }
   await fetchChannels();
   renderChannelList();
   bindGlobalEvents();
+  if (editorMode === 'readonly') applyReadonlyMode();
 }
 
 async function api(url, options = {}) {
@@ -28,13 +34,13 @@ function renderChannelList() {
   state.channels.forEach((ch) => {
     const el = document.createElement("div");
     el.className = "channel-item" + (ch.id === state.selectedChannelId ? " selected" : "") + (ch.videos.length === 0 ? " empty" : "");
-    el.draggable = true;
+    if (editorMode !== 'readonly') el.draggable = true;
     el.dataset.channelId = ch.id;
     el.innerHTML = `<div class="ch-drag-handle">&#x2807;</div><div><div class="ch-name">${esc(ch.name)}</div><div class="ch-count">${ch.videos.length} videos</div></div>`;
     el.onclick = () => selectChannel(ch.id);
     channelListEl.appendChild(el);
   });
-  bindChannelDragEvents();
+  if (editorMode !== 'readonly') bindChannelDragEvents();
 }
 
 function bindChannelDragEvents() {
@@ -79,7 +85,7 @@ function renderVideoList(videos) {
   videos.sort((a, b) => a.position - b.position).forEach((v) => {
     const el = document.createElement("div");
     el.className = "video-item";
-    el.draggable = true;
+    if (editorMode !== 'readonly') el.draggable = true;
     el.dataset.videoId = v.videoId;
     el.innerHTML = `
       <div class="drag-handle">&#x2807;</div>
@@ -98,9 +104,13 @@ function renderVideoList(videos) {
       </div>
       <button class="btn-remove" data-video-id="${esc(v.videoId)}">&times;</button>`;
     videoListEl.appendChild(el);
+    if (editorMode === 'readonly') {
+      el.querySelectorAll('.time-input').forEach(inp => inp.disabled = true);
+      el.querySelectorAll('.btn-update-times, .btn-remove').forEach(btn => btn.disabled = true);
+    }
   });
   bindVideoEvents();
-  bindDragEvents();
+  if (editorMode !== 'readonly') bindDragEvents();
   videos.forEach((v) => {
     fetchVideoTitle(v.videoId).then((title) => {
       if (!title) return;
@@ -127,14 +137,16 @@ function bindGlobalEvents() {
 }
 
 function bindVideoEvents() {
-  videoListEl.querySelectorAll(".btn-remove").forEach((b) => { b.onclick = () => removeVideo(b.dataset.videoId); });
+  if (editorMode !== 'readonly') {
+    videoListEl.querySelectorAll(".btn-remove").forEach((b) => { b.onclick = () => removeVideo(b.dataset.videoId); });
+    videoListEl.querySelectorAll(".btn-update-times").forEach((b) => { b.onclick = () => updateVideoTimes(b.dataset.videoId); });
+  }
   videoListEl.querySelectorAll(".btn-preview").forEach((b) => { b.onclick = () => {
     const vid = b.dataset.videoId;
     const startEl = videoListEl.querySelector(`.input-start[data-video-id="${vid}"]`);
     const endEl = videoListEl.querySelector(`.input-end[data-video-id="${vid}"]`);
     openPreview(vid, startEl ? parseTime(startEl.value) : 0, endEl ? parseTime(endEl.value) : 0);
   }; });
-  videoListEl.querySelectorAll(".btn-update-times").forEach((b) => { b.onclick = () => updateVideoTimes(b.dataset.videoId); });
 }
 
 function bindDragEvents() {
@@ -451,5 +463,21 @@ function extractVideoId(input) {
 }
 
 function esc(s) { const d = document.createElement("div"); d.textContent = s; return d.innerHTML; }
+
+function applyReadonlyMode() {
+  document.getElementById('readonly-banner').style.display = 'flex';
+  document.getElementById('btn-new-channel').disabled = true;
+  document.getElementById('btn-import').disabled = true;
+  document.getElementById('channel-name-input').disabled = true;
+  document.getElementById('btn-save-name').disabled = true;
+  document.getElementById('btn-delete-channel').disabled = true;
+  document.getElementById('add-video-input').disabled = true;
+  document.getElementById('btn-add-video').disabled = true;
+  document.getElementById('playlist-url-input').disabled = true;
+  document.getElementById('btn-import-playlist').disabled = true;
+  document.getElementById('btn-mark-start').disabled = true;
+  document.getElementById('btn-mark-end').disabled = true;
+  document.getElementById('btn-confirm-playlist').disabled = true;
+}
 
 init();

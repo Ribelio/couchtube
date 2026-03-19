@@ -100,13 +100,13 @@ You can configure CouchTube using environment variables.
 | `PORT`                   | The port number on which CouchTube will run.                                    |
 | `DATABASE_FILE_PATH`     | The path to the SQLite database file used by CouchTube.                         |
 | `DEFAULT_CHANNELS_PATH`  | Path to the JSON file used to seed the database on first run. Default: `/videos.json`. |
-| `EDITOR_MODE`            | If set to `true`, enables the channel editor at `/editor`.                      |
+| `EDITOR_MODE`            | Controls the channel editor at `/editor`. Values: `off` (default, hidden), `readonly` (visible but no edits), `full` (fully enabled). Also accepts `true`/`false` for backward compat. |
 
 ### Editor
 
 ![CouchTube Editor](docs/screenshots/editor-screenshot.png)
 
-CouchTube includes a built-in channel editor at `/editor` (enable with `EDITOR_MODE=true`). The editor lets you:
+CouchTube includes a built-in channel editor at `/editor`. Set `EDITOR_MODE=full` to enable editing, or `EDITOR_MODE=readonly` to let users browse without making changes (useful for demos). The editor lets you:
 
 - **Manage channels** — create, rename, and delete channels from the sidebar
 - **Add videos** — paste a YouTube URL or video ID to add videos to a channel

@@ -453,3 +453,36 @@ input[type="number"]:focus {
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
+#readonly-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 0;
+    background: rgba(0, 255, 1, 0.08);
+    border-bottom: 1px solid rgba(0, 255, 1, 0.2);
+    color: rgba(0, 255, 1, 0.5);
+    font-family: "VT323", monospace;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+.btn:disabled,
+.btn-remove:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+input:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.channel-item:not([draggable="true"]) .ch-drag-handle,
+.video-item:not([draggable="true"]) .drag-handle {
+    opacity: 0.2;
+    cursor: default;
+}
