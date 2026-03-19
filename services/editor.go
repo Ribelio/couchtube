@@ -108,6 +108,10 @@ func (s *EditorService) ReorderVideos(channelID int, videoIDs []string) error {
 	return s.VideoRepo.ReorderVideos(channelID, videoIDs)
 }
 
+func (s *EditorService) ReorderChannels(channelIDs []int) error {
+	return s.ChannelRepo.ReorderChannels(channelIDs)
+}
+
 func (s *EditorService) ExportJSON() (*jsonmodels.ChannelsJson, error) {
 	channels, videos, err := s.ChannelRepo.FetchAllChannelsWithVideos()
 	if err != nil {

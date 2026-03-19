@@ -120,6 +120,7 @@ func createTables(db *sql.DB) error {
 	createChannelsTableQuery := `CREATE TABLE IF NOT EXISTS channels (
 		"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 		"name" TEXT,
+		"position" INTEGER NOT NULL DEFAULT 0,
 		UNIQUE(name)
 	);`
 	createChannelVideosTableQuery := `CREATE TABLE IF NOT EXISTS channel_videos (
@@ -146,11 +147,29 @@ func createTables(db *sql.DB) error {
 }
 
 
+func migrateChannelPosition(db *sql.DB) error {
+	if !tableExists(db, "channels") || columnExists(db, "channels", "position") {
+		return nil
+	}
+	log.Println("Migrating schema: adding position to channels...")
+	if _, err := db.Exec(`ALTER TABLE channels ADD COLUMN "position" INTEGER NOT NULL DEFAULT 0`); err != nil {
+		return fmt.Errorf("add position to channels: %w", err)
+	}
+	if _, err := db.Exec(`UPDATE channels SET position = id`); err != nil {
+		return fmt.Errorf("initialize channel positions: %w", err)
+	}
+	log.Println("Channel position migration completed.")
+	return nil
+}
+
 func InitDatabase(db *sql.DB) {
 	if err := migrateSchema(db); err != nil {
 		log.Fatal("Failed to migrate schema:", err)
 	}
 	if err := createTables(db); err != nil {
 		log.Fatal("Failed to create tables:", err)
+	}
+	if err := migrateChannelPosition(db); err != nil {
+		log.Fatal("Failed to migrate channel position:", err)
 	}
 }

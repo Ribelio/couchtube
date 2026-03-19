@@ -11,12 +11,15 @@ body { font-family: 'VT323', monospace; background: var(--background-color); col
 #sidebar-header { padding: 12px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
 .sidebar-title { font-weight: 400; font-size: 18px; color: var(--tertiary-color); }
 #channel-list { flex: 1; overflow-y: auto; }
-.channel-item { padding: 10px 12px; cursor: pointer; border-left: 3px solid transparent; display: flex; justify-content: space-between; align-items: center; transition: background 0.1s; font-size: 16px; }
+.channel-item { padding: 10px 12px; cursor: pointer; border-left: 3px solid transparent; display: flex; align-items: center; gap: 2px; transition: background 0.1s; font-size: 16px; }
 .channel-item:hover { background: #1a1a1a; }
 .channel-item.selected { background: #1a1a1a; border-left-color: var(--tertiary-color); }
 .channel-item .ch-name { font-size: 16px; }
 .channel-item .ch-count { font-size: 14px; color: #666; }
 .channel-item.empty .ch-name { opacity: 0.5; }
+.channel-item.dragging { opacity: 0.4; }
+.channel-item.drag-over { border-top: 2px solid var(--tertiary-color); padding-top: 8px; }
+.ch-drag-handle { cursor: grab; color: #555; font-size: 20px; user-select: none; margin-right: 6px; }
 #sidebar-footer { padding: 10px 12px; border-top: 1px solid #333; display: flex; gap: 6px; flex-wrap: wrap; }
 #sidebar-footer .btn { flex: 1; }
 #btn-home { flex-basis: 100%; text-align: center; text-decoration: none; }

@@ -83,6 +83,7 @@ func main() {
 		{Path: "/api/config", Handler: handlers.GetConfigs},
 		{Path: "/api/load-defaults", Handler: editorHandler.LoadDefaults},
 		{Path: "/api/editor/channels", Handler: editorHandler.HandleChannels, EditorOnly: true},
+		{Path: "/api/editor/channels/reorder", Handler: editorHandler.ReorderChannels, EditorOnly: true},
 		{Path: "/api/editor/channels/videos", Handler: editorHandler.HandleVideos, EditorOnly: true},
 		{Path: "/api/editor/channels/videos/reorder", Handler: editorHandler.ReorderVideos, EditorOnly: true},
 		{Path: "/api/editor/export", Handler: editorHandler.ExportJSON, EditorOnly: true},

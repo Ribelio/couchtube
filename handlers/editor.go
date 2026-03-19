@@ -207,6 +207,29 @@ func (h *Editor) ReorderVideos(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true})
 }
 
+func (h *Editor) ReorderChannels(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	var body struct {
+		ChannelIDs []int `json:"channelIds"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || len(body.ChannelIDs) == 0 {
+		http.Error(w, "channelIds is required", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.Service.ReorderChannels(body.ChannelIDs); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{"success": true})
+}
+
 func (h *Editor) ExportJSON(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)

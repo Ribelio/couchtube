@@ -14,6 +14,7 @@ type ChannelRepository interface {
 	RenameChannel(channelID int, name string) error
 	DeleteChannel(channelID int) error
 	DeleteAllChannels(tx *sql.Tx) error
+	ReorderChannels(channelIDs []int) error
 }
 
 type channelRepository struct {
@@ -30,12 +31,13 @@ func (r *channelRepository) BeginTx() (*sql.Tx, error) {
 
 func (r *channelRepository) FetchAllChannels() ([]dbmodels.Channel, error) {
 	query := `
-    SELECT id, name
+    SELECT id, name, position
     FROM channels
     WHERE EXISTS (
         SELECT 1 FROM channel_videos
         WHERE channel_videos.channel_id = channels.id
-    );`
+    )
+    ORDER BY position;`
 
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -46,7 +48,7 @@ func (r *channelRepository) FetchAllChannels() ([]dbmodels.Channel, error) {
 	var channels []dbmodels.Channel
 	for rows.Next() {
 		var channel dbmodels.Channel
-		if err := rows.Scan(&channel.ID, &channel.Name); err != nil {
+		if err := rows.Scan(&channel.ID, &channel.Name, &channel.Position); err != nil {
 			return nil, err
 		}
 		channels = append(channels, channel)
@@ -56,7 +58,7 @@ func (r *channelRepository) FetchAllChannels() ([]dbmodels.Channel, error) {
 }
 
 func (r *channelRepository) FetchAllChannelsWithVideos() ([]dbmodels.Channel, []dbmodels.Video, error) {
-	channelRows, err := r.db.Query(`SELECT id, name FROM channels ORDER BY id`)
+	channelRows, err := r.db.Query(`SELECT id, name, position FROM channels ORDER BY position`)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -65,7 +67,7 @@ func (r *channelRepository) FetchAllChannelsWithVideos() ([]dbmodels.Channel, []
 	var channels []dbmodels.Channel
 	for channelRows.Next() {
 		var channel dbmodels.Channel
-		if err := channelRows.Scan(&channel.ID, &channel.Name); err != nil {
+		if err := channelRows.Scan(&channel.ID, &channel.Name, &channel.Position); err != nil {
 			return nil, nil, err
 		}
 		channels = append(channels, channel)
@@ -105,7 +107,7 @@ func (r *channelRepository) InsertChannel(tx *sql.Tx, channelName string) (int, 
 		exec = tx.Exec
 	}
 
-	result, err := exec("INSERT INTO channels (name) VALUES (?) RETURNING id", channelName)
+	result, err := exec("INSERT INTO channels (name, position) VALUES (?, (SELECT COALESCE(MAX(position), -1) + 1 FROM channels)) RETURNING id", channelName)
 	if err != nil {
 		return 0, err
 	}
@@ -152,4 +154,44 @@ func (r *channelRepository) DeleteAllChannels(tx *sql.Tx) error {
 
 	_, err := exec("DELETE FROM channels")
 	return err
+}
+
+func (r *channelRepository) ReorderChannels(channelIDs []int) error {
+	var count int
+	err := r.db.QueryRow(`SELECT COUNT(*) FROM channels`).Scan(&count)
+	if err != nil {
+		return err
+	}
+	if count != len(channelIDs) {
+		return fmt.Errorf("channel count mismatch: expected %d, got %d", count, len(channelIDs))
+	}
+
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	stmt, err := tx.Prepare(`UPDATE channels SET position = ? WHERE id = ?`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	for i, channelID := range channelIDs {
+		result, err := stmt.Exec(i, channelID)
+		if err != nil {
+			return err
+		}
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected == 0 {
+			return fmt.Errorf("channel %d not found", channelID)
+		}
+	}
+
+	return tx.Commit()
 }

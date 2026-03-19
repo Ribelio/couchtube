@@ -28,10 +28,35 @@ function renderChannelList() {
   state.channels.forEach((ch) => {
     const el = document.createElement("div");
     el.className = "channel-item" + (ch.id === state.selectedChannelId ? " selected" : "") + (ch.videos.length === 0 ? " empty" : "");
-    el.innerHTML = `<div><div class="ch-name">${esc(ch.name)}</div><div class="ch-count">${ch.videos.length} videos</div></div>`;
+    el.draggable = true;
+    el.dataset.channelId = ch.id;
+    el.innerHTML = `<div class="ch-drag-handle">&#x2807;</div><div><div class="ch-name">${esc(ch.name)}</div><div class="ch-count">${ch.videos.length} videos</div></div>`;
     el.onclick = () => selectChannel(ch.id);
     channelListEl.appendChild(el);
   });
+  bindChannelDragEvents();
+}
+
+function bindChannelDragEvents() {
+  let draggedEl = null;
+  channelListEl.querySelectorAll(".channel-item").forEach((item) => {
+    item.addEventListener("dragstart", (e) => { draggedEl = item; item.classList.add("dragging"); e.dataTransfer.effectAllowed = "move"; });
+    item.addEventListener("dragend", () => { item.classList.remove("dragging"); channelListEl.querySelectorAll(".channel-item").forEach((i) => i.classList.remove("drag-over")); draggedEl = null; });
+    item.addEventListener("dragover", (e) => { e.preventDefault(); if (draggedEl && draggedEl !== item) item.classList.add("drag-over"); });
+    item.addEventListener("dragleave", () => { item.classList.remove("drag-over"); });
+    item.addEventListener("drop", (e) => {
+      e.preventDefault(); item.classList.remove("drag-over");
+      if (!draggedEl || draggedEl === item) return;
+      const all = [...channelListEl.querySelectorAll(".channel-item")];
+      if (all.indexOf(draggedEl) < all.indexOf(item)) item.after(draggedEl); else item.before(draggedEl);
+      reorderChannels([...channelListEl.querySelectorAll(".channel-item")].map((el) => parseInt(el.dataset.channelId)));
+    });
+  });
+}
+
+async function reorderChannels(channelIds) {
+  try { await api("/api/editor/channels/reorder", { method: "PUT", body: JSON.stringify({ channelIds }) }); await fetchChannels(); }
+  catch (e) { alert("Reorder failed: " + e.message); }
 }
 
 function selectChannel(id) {
