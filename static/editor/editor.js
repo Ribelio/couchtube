@@ -286,12 +286,39 @@ async function importPlaylist() {
     document.getElementById("playlist-modal-body").innerHTML = data.videos.map((v, i) => `
       <div class="playlist-video-item">
         <input type="checkbox" checked data-index="${i}" />
-        <img src="https://img.youtube.com/vi/${esc(v.id)}/default.jpg" />
-        <span class="pv-id">${esc(v.id)}</span>
-        <label>End (s):</label>
-        <input type="number" class="pv-end" data-index="${i}" min="1" placeholder="required" />
+        <a href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank"><img src="https://img.youtube.com/vi/${esc(v.id)}/default.jpg" /></a>
+        <div class="pv-details">
+          <a class="pv-title" href="https://www.youtube.com/watch?v=${esc(v.id)}" target="_blank" data-video-id="${esc(v.id)}">${esc(v.id)}</a>
+          <div class="pv-id-small">${esc(v.id)}</div>
+        </div>
+        <label>Start:</label>
+        <input type="text" class="pv-start time-input" data-index="${i}" value="0:00" placeholder="0:00" />
+        <label>End:</label>
+        <input type="text" class="pv-end time-input" data-index="${i}" placeholder="loading..." readonly />
       </div>`).join("");
     document.getElementById("playlist-modal").style.display = "flex";
+    // Fetch titles for all videos
+    data.videos.forEach((v) => {
+      fetchVideoTitle(v.id).then((title) => {
+        if (!title) return;
+        const el = document.querySelector(`.pv-title[data-video-id="${v.id}"]`);
+        if (el) el.textContent = title;
+      });
+    });
+    // Auto-fetch durations for all videos
+    for (let i = 0; i < data.videos.length; i++) {
+      const v = data.videos[i];
+      const endEl = document.querySelector(`.pv-end[data-index="${i}"]`);
+      let dur = videoDurations[v.id];
+      if (!dur) {
+        dur = await getVideoDuration(v.id);
+        if (dur > 0) videoDurations[v.id] = dur;
+      }
+      if (endEl) {
+        if (dur > 0) { endEl.value = formatTime(dur); endEl.readOnly = false; }
+        else { endEl.value = ""; endEl.placeholder = "required"; endEl.readOnly = false; }
+      }
+    }
   } catch (e) { alert("Failed: " + e.message); }
 }
 async function confirmPlaylistImport() {
@@ -299,8 +326,9 @@ async function confirmPlaylistImport() {
   const toAdd = [];
   document.querySelectorAll(".playlist-video-item").forEach((item, i) => {
     if (item.querySelector('input[type="checkbox"]').checked) {
-      const end = parseInt(item.querySelector(".pv-end").value);
-      if (end > 0) toAdd.push({ videoId: pendingPlaylistVideos[i].id, sectionStart: 0, sectionEnd: end });
+      const start = parseTime(item.querySelector(".pv-start").value);
+      const end = parseTime(item.querySelector(".pv-end").value);
+      if (end > start) toAdd.push({ videoId: pendingPlaylistVideos[i].id, sectionStart: start, sectionEnd: end });
     }
   });
   if (toAdd.length === 0) { alert("No videos selected or end times not set"); return; }
