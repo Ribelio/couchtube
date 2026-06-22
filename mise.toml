@@ -1,0 +1,16 @@
+[tools]
+go = "latest"
+
+[tasks.yt]
+run = "go run main.go"
+dir = "{{vars.couch}}"
+env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full" }
+# depends = "open-browser"
+
+# opens the localhost address
+[tasks.open-browser]
+run = "{{vars.couch}}.lnk"
+hide = true
+
+[vars]
+couch = "couchtube"
