@@ -4,16 +4,23 @@ pitchfork = "latest"
 
 [tasks.yt]
 run = "go run cmd/main.go"
-env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full" }
+env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full", AUTO_OPEN_BROWSER="true" }
 
 # opens the localhost address in default browser
 [tasks.open]
 run = "xdg-open http://localhost:8363"
+run_windows = "start http://localhost:8363"
 hide = true
 
-# starts the server and opens the browser after a brief delay
+# starts the server in background (browser opens automatically)
 [tasks.start]
-run = "mise run yt & sleep 2 && mise run open"
+run = "mise run yt &"
+
+# kills the server running on port 8363
+[tasks.kill]
+run = "pkill -f 'cmd/main.go' || fuser -k 8363/tcp"
+run_windows = "taskkill /F /IM main.exe"
+hide = true
 
 [vars]
 couch = "couchtube"
