@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os/exec"
 	"strings"
 
 	"github.com/ozencb/couchtube/config"
@@ -128,15 +127,6 @@ func main() {
 	}
 
 	port := config.GetPort()
-
-	if config.GetAutoOpenBrowser() {
-		url := "http://localhost:" + port
-		if err := exec.Command("xdg-open", url).Start(); err != nil {
-			log.Printf("Warning: failed to open browser: %v", err)
-		} else {
-			log.Println("Browser opened to", url)
-		}
-	}
 
 	log.Println("Server starting on port", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

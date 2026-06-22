@@ -14,9 +14,8 @@ var (
 	port                string
 	dbFilePath          string
 	defaultChannelsPath string
-	editorMode          string
-	autoOpenBrowser     bool
-	once                sync.Once
+	editorMode string
+	once       sync.Once
 )
 
 func init() {
@@ -29,7 +28,6 @@ func init() {
 		dbFilePath = getEnv("DATABASE_FILE_PATH", "couchtube.db")
 		defaultChannelsPath = getEnv("DEFAULT_CHANNELS_PATH", "/videos.json")
 		editorMode = getEnvAsEditorMode("EDITOR_MODE", "off")
-		autoOpenBrowser = getEnvAsBool("AUTO_OPEN_BROWSER", true)
 	})
 }
 
@@ -85,23 +83,4 @@ func GetDefaultChannelsPath() string {
 
 func GetEditorMode() string {
 	return editorMode
-}
-
-func GetAutoOpenBrowser() bool {
-	return autoOpenBrowser
-}
-
-func getEnvAsBool(key string, fallback bool) bool {
-	if value, exists := os.LookupEnv(key); exists {
-		v := strings.ToLower(strings.TrimSpace(value))
-		switch v {
-		case "true", "1", "yes":
-			return true
-		case "false", "0", "no":
-			return false
-		default:
-			return fallback
-		}
-	}
-	return fallback
 }

@@ -1,10 +1,12 @@
 [tools]
-go = "latest"
+[tools.go]
+version = "latest"
+postinstall = "go mod download"
 pitchfork = "latest"
 
 [tasks.yt]
 run = "go run cmd/main.go"
-env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full", AUTO_OPEN_BROWSER="true" }
+env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full" }
 
 # opens the localhost address in default browser
 [tasks.open]
@@ -12,9 +14,10 @@ run = "xdg-open http://localhost:8363"
 run_windows = "start http://localhost:8363"
 hide = true
 
-# starts the server in background (browser opens automatically)
+# starts server in background, opens browser after delay
 [tasks.start]
-run = "mise run yt &"
+run = "mise run yt & sleep 2 && mise run open"
+run_windows = "mise run yt & timeout /t 2 /nobreak >nul && mise run open"
 
 # kills the server running on port 8363
 [tasks.kill]
