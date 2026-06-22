@@ -1,16 +1,19 @@
 [tools]
 go = "latest"
+pitchfork = "latest"
 
 [tasks.yt]
-run = "go run main.go"
-dir = "{{vars.couch}}"
+run = "go run cmd/main.go"
 env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full" }
-# depends = "open-browser"
 
-# opens the localhost address
-[tasks.open-browser]
-run = "{{vars.couch}}.lnk"
+# opens the localhost address in default browser
+[tasks.open]
+run = "xdg-open http://localhost:8363"
 hide = true
+
+# starts the server and opens the browser after a brief delay
+[tasks.start]
+run = "mise run yt & sleep 2 && mise run open"
 
 [vars]
 couch = "couchtube"
