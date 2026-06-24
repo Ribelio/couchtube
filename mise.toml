@@ -5,9 +5,10 @@ postinstall = "go mod download"
 pitchfork = "latest"
 
 [tasks.youtube]
-alias="yt"
+alias = "yt"
 run = "go run cmd/main.go"
-env = { PORT=8363, DATABASE_FILE_PATH="{{vars.couch}}.db", EDITOR_MODE="full" }
+dir = "{{config_root}}"
+env = { PORT = 8363, DATABASE_FILE_PATH = "{{vars.couch}}.db", EDITOR_MODE = "full" }
 
 # opens the localhost address in default browser
 [tasks.open]
@@ -18,9 +19,8 @@ hide = true
 
 # opens browser, starts server in background
 [tasks.start]
-depends = ["open","yt"]
+depends = ["open", "yt"]
 alias = "s"
-
 
 # kills the server running on port 8363
 [tasks.kill]

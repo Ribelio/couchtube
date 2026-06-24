@@ -19,7 +19,11 @@ func NewEditorHandler(service *services.EditorService) *Editor {
 
 func ServeEditor() http.Handler {
 	fs := http.FileServer(http.Dir("./static/editor"))
-	return http.StripPrefix("/editor/", fs)
+	noCached := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Cache-Control", "no-store")
+		fs.ServeHTTP(w, r)
+	})
+	return http.StripPrefix("/editor/", noCached)
 }
 
 func (h *Editor) HandleChannels(w http.ResponseWriter, r *http.Request) {
