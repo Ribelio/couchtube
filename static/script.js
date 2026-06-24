@@ -88,6 +88,46 @@ const closeSettingsPanel = () =>
     .querySelector("#settings-modal-container")
     ?.classList.remove("active");
 
+const openEditorDrawer = () => {
+  const drawer = document.querySelector("#editor-drawer");
+  const iframe = document.querySelector("#editor-iframe");
+  // Load editor on first open; keep it loaded between opens within the session
+  if (!iframe.src || iframe.src === "about:blank") {
+    iframe.src = "/editor/";
+  }
+  drawer?.classList.add("open");
+};
+
+const closeEditorDrawer = async (state) => {
+  document.querySelector("#editor-drawer")?.classList.remove("open");
+
+  // Silently re-sync channel list without touching the player
+  try {
+    const updatedChannels = await fetchChannels();
+    if (updatedChannels.length > 0) {
+      state.channels = updatedChannels;
+      updateChannelList(state, updatedChannels);
+
+      // If the playing channel was deleted inside the editor, switch gracefully
+      const stillExists = updatedChannels.some(
+        (ch) => ch.id === state.currentChannel?.id,
+      );
+      if (!stillExists) {
+        const { newChannel, newVideo } = await jumpToChannel(
+          state,
+          updatedChannels[0].id,
+        );
+        state.currentChannel = newChannel;
+        state.currentVideo = newVideo;
+        updateChannelName(newChannel, state.settings);
+        showStatus("↺ CHANNEL REMOVED — SWITCHED");
+      }
+    }
+  } catch (e) {
+    console.warn("Could not sync channels after editor close:", e);
+  }
+};
+
 const loadYouTubeAPI = (onReady) => {
   const tag = document.createElement("script");
   tag.src = IFRAME_API_URL;
@@ -696,6 +736,14 @@ const addEventListeners = (state) => {
     });
 
   document.addEventListener("keydown", (event) => {
+    const drawerOpen = document
+      .querySelector("#editor-drawer")
+      ?.classList.contains("open");
+    if (drawerOpen) {
+      if (event.key === "Escape") closeEditorDrawer(state);
+      return;
+    }
+
     if (state.isOverlayOpen) {
       switch (event.key) {
         case "ArrowUp":
@@ -785,6 +833,11 @@ const addEventListeners = (state) => {
 
   document.addEventListener("DOMContentLoaded", fetchConfig);
 
+  // Editor drawer
+  document
+    .querySelector("#editor-drawer-close")
+    ?.addEventListener("click", () => closeEditorDrawer(state));
+
   // Settings panel
   document
     .querySelector("#settings-modal-close-button")
@@ -819,7 +872,8 @@ const addEventListeners = (state) => {
   document
     .querySelector("#settings-editor-link")
     ?.addEventListener("click", () => {
-      window.location.href = "/editor/";
+      closeSettingsPanel();
+      openEditorDrawer();
     });
 };
 
