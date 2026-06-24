@@ -79,6 +79,63 @@ body {
     display: block;
 }
 
+#video-title {
+    position: absolute;
+    top: 100px;
+    left: 25px;
+    z-index: 3;
+    color: var(--tertiary-color);
+    font-size: 2.2rem;
+    line-height: 1;
+    display: none;
+    max-width: 65%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#video-title.active {
+    display: block;
+}
+
+@keyframes crt-glow {
+    0% {
+        text-shadow:
+            2px 0 5px rgba(255, 0, 0, 0.7),
+            -2px 0 5px rgba(0, 0, 255, 0.7),
+            0 0 15px currentColor;
+    }
+    25% {
+        text-shadow:
+            -2px 0 5px rgba(255, 0, 0, 0.7),
+            2px 0 5px rgba(0, 0, 255, 0.7),
+            0 0 10px currentColor;
+    }
+    50% {
+        text-shadow:
+            1px 0 8px rgba(255, 0, 0, 0.5),
+            -1px 0 8px rgba(0, 0, 255, 0.5),
+            0 0 20px currentColor;
+    }
+    75% {
+        text-shadow:
+            -1px 0 5px rgba(255, 0, 0, 0.7),
+            1px 0 5px rgba(0, 0, 255, 0.7),
+            0 0 10px currentColor;
+    }
+    100% {
+        text-shadow:
+            2px 0 5px rgba(255, 0, 0, 0.7),
+            -2px 0 5px rgba(0, 0, 255, 0.7),
+            0 0 15px currentColor;
+    }
+}
+
+#channel-name.active,
+#video-title.active {
+    animation: crt-glow 1.9s ease-in-out infinite;
+}
+
 #controls {
     position: absolute;
     bottom: 25px;
@@ -90,7 +147,8 @@ body {
         "top top top"
         "channel . volume"
         "channel . volume"
-        "bottom bottom bottom";
+        "bottom bottom bottom"
+        "readout readout readout";
     gap: 5px;
     z-index: 5;
     padding: 5px;
@@ -158,17 +216,112 @@ body {
     justify-content: space-between;
 }
 
+.readout-controls {
+    grid-area: readout;
+    justify-content: center;
+}
+
+#state-readout {
+    font-family: "VT323", monospace;
+    font-size: 1rem;
+    color: #666;
+    text-align: center;
+    letter-spacing: 0.1em;
+    min-height: 1em;
+    padding: 2px 0;
+}
+
 .buffer-gif {
     position: absolute;
     z-index: 3;
     height: 100%;
     width: 100%;
-    display: none;
+    opacity: 0;
+    pointer-events: none;
     background-repeat: repeat;
+    transition: opacity 0.4s ease;
 }
 
 .buffer-gif.active {
-    display: block;
+    opacity: 0.25;
+}
+
+#smpte-bars {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: none;
+    flex-direction: row;
+}
+
+#smpte-bars.active {
+    display: flex;
+}
+
+.smpte-bar {
+    flex: 1;
+    height: 100%;
+}
+
+.smpte-white {
+    background: #ffffff;
+}
+.smpte-yellow {
+    background: #ffff00;
+}
+.smpte-cyan {
+    background: #00ffff;
+}
+.smpte-green {
+    background: #00ff00;
+}
+.smpte-magenta {
+    background: #ff00ff;
+}
+.smpte-red {
+    background: #ff0000;
+}
+.smpte-blue {
+    background: #0000ff;
+}
+
+#status {
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    z-index: 4;
+    color: var(--tertiary-color);
+    font-size: 2.5rem;
+    line-height: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    text-shadow: 0 0 10px currentColor;
+}
+
+#status.visible {
+    opacity: 1;
+}
+
+.settings-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 4px 0;
+    font-size: 1.4em;
+    color: var(--secondary-color);
+}
+
+.settings-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--secondary-color);
+    flex-shrink: 0;
 }
 
 #transparent-overlay {
@@ -366,6 +519,75 @@ body {
     background-color: transparent;
     color: var(--secondary-color);
     border: 2px solid var(--secondary-color);
+}
+
+#channel-list-overlay .overlay-body {
+    background: #000;
+    color: var(--primary-color);
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid var(--tertiary-color);
+    padding: 0;
+}
+
+.overlay-header {
+    font-size: 1.8rem;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--secondary-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.overlay-hint {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+#overlay-channel-list {
+    overflow-y: auto;
+    padding: 5px 0;
+}
+
+.overlay-channel-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.3rem;
+    border-bottom: 1px solid #111;
+}
+
+.overlay-channel-item.highlighted {
+    background: var(--secondary-color);
+}
+
+.overlay-channel-item.active {
+    color: var(--tertiary-color);
+}
+
+.overlay-channel-item .channel-id {
+    color: #666;
+    min-width: 40px;
+}
+
+.overlay-channel-item .channel-name {
+    flex: 1;
+    margin-left: 10px;
+}
+
+.overlay-channel-item .channel-now-playing {
+    color: #666;
+    font-size: 1rem;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: right;
 }
 
 @media (max-width: 768px) {

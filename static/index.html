@@ -19,12 +19,23 @@
     <body>
         <div id="transparent-overlay"></div>
         <div class="player-wrapper">
+            <div id="smpte-bars">
+                <div class="smpte-bar smpte-white"></div>
+                <div class="smpte-bar smpte-yellow"></div>
+                <div class="smpte-bar smpte-cyan"></div>
+                <div class="smpte-bar smpte-green"></div>
+                <div class="smpte-bar smpte-magenta"></div>
+                <div class="smpte-bar smpte-red"></div>
+                <div class="smpte-bar smpte-blue"></div>
+            </div>
             <img
                 src="/assets/static.gif"
                 id="buffer-gif"
                 class="buffer-gif active"
             />
             <div id="channel-name">Couchtube 00</div>
+            <div id="video-title"></div>
+            <div id="status"></div>
             <div id="player"></div>
             <div id="controls">
                 <div class="control-group top-controls">
@@ -82,7 +93,7 @@
                             src="/assets/icons/fullscreen.svg"
                         />
                     </button>
-                    <button id="control-settings" style="display: none">
+                    <button id="control-settings">
                         <img
                             class="control-icon"
                             src="/assets/icons/settings.svg"
@@ -94,6 +105,9 @@
                             src="/assets/icons/contract.svg"
                         />
                     </button>
+                </div>
+                <div class="control-group readout-controls">
+                    <div id="state-readout"></div>
                 </div>
             </div>
 
@@ -132,7 +146,7 @@
             </div>
         </div>
 
-<div id="welcome-modal-container" class="modal-container">
+        <div id="welcome-modal-container" class="modal-container">
             <div class="modal-body">
                 <div class="modal-title">
                     <div>Welcome to Couchtube</div>
@@ -167,6 +181,19 @@
             </div>
         </div>
 
+        <div id="channel-list-overlay" class="modal-container">
+            <div class="overlay-body">
+                <div class="overlay-header">
+                    CHANNEL GUIDE
+                    <span class="overlay-hint"
+                        >Arrows: navigate &middot; Enter: select &middot; Esc:
+                        close</span
+                    >
+                </div>
+                <div id="overlay-channel-list"></div>
+            </div>
+        </div>
+
         <div id="message-modal" class="modal-container">
             <div id="message-modal-body" class="modal-body">
                 <div id="message-modal-title" class="modal-title">
@@ -181,6 +208,41 @@
 
                 <div class="modal-content">
                     <div id="message-modal-content"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="settings-modal-container" class="modal-container">
+            <div id="settings-modal" class="modal-body">
+                <div id="settings-modal-title" class="modal-title">
+                    <div>Settings</div>
+                    <div
+                        id="settings-modal-close-button"
+                        class="modal-close-button"
+                    >
+                        <img src="/assets/icons/cross.svg" />
+                    </div>
+                </div>
+                <div class="modal-content">
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="setting-channel-name" />
+                        <span>Show channel name</span>
+                    </label>
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="setting-video-title" />
+                        <span>Show video title</span>
+                    </label>
+                    <label class="settings-toggle">
+                        <input type="checkbox" id="setting-captions" />
+                        <span>Show captions</span>
+                    </label>
+                    <button
+                        id="settings-editor-link"
+                        class="welcome-button secondary"
+                        style="display: none; margin-top: 15px"
+                    >
+                        Open Editor
+                    </button>
                 </div>
             </div>
         </div>
