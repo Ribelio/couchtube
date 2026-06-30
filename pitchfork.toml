@@ -1,2 +1,9 @@
-[daemons.app]
-run = "mise run yt"
+#:schema https://pitchfork.jdx.dev/schema.json
+
+[daemons.dev]
+run = "mise run dev"
+auto = ["start", "stop"]
+retry = 3
+
+[daemons.dev.hooks]
+on_ready = "echo 'CouchTube ready — open http://localhost:8363'"

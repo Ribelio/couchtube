@@ -1,32 +1,66 @@
 [tools]
-[tools.go]
-version = "latest"
-postinstall = "go mod download"
+go = { version = "latest", postinstall = "go mod download" }
 pitchfork = "latest"
 
-[tasks.youtube]
-alias = "yt"
-run = "go run cmd/main.go"
-dir = "{{config_root}}"
-env = { PORT = 8363, DATABASE_FILE_PATH = "{{vars.couch}}.db", EDITOR_MODE = "full" }
-
-# opens the localhost address in default browser
-[tasks.open]
-run = "xdg-open http://localhost:8363"
-run_windows = "start http://localhost:8363"
-alias = "o"
-hide = true
-
-# opens browser, starts server in background
-[tasks.start]
-depends = ["open", "yt"]
-alias = "s"
-
-# kills the server running on port 8363
-[tasks.kill]
-run = "pkill -f 'cmd/main.go' || fuser -k 8363/tcp"
-run_windows = "taskkill /F /IM main.exe"
-hide = true
-
 [vars]
-couch = "couchtube"
+PORT = "8363"
+DEV_CMD = "go run cmd/main.go"
+BUILD_CMD = "go build -o couchtube cmd/main.go"
+KILL_PATTERN = "cmd/main.go"
+
+# ── Dev ───────────────────────────────────────────────────────────────────────
+
+[tasks.dev]
+alias = "d"
+run = "{{ vars.DEV_CMD }}"
+dir = "{{ config_root }}"
+env = { PORT = "{{ vars.PORT }}", DATABASE_FILE_PATH = "{{ config_root | basename }}.db", EDITOR_MODE = "full" }
+
+[tasks.build]
+alias = "b"
+run = "{{ vars.BUILD_CMD }}"
+dir = "{{ config_root }}"
+
+[tasks.clean]
+run = "rm -f couchtube {{ config_root | basename }}.db"
+
+# ── Lifecycle ─────────────────────────────────────────────────────────────────
+
+[tasks.open]
+alias = "o"
+run = "xdg-open http://localhost:{{ vars.PORT }}"
+run_windows = "start http://localhost:{{ vars.PORT }}"
+
+[tasks.kill]
+alias = "k"
+run = "pkill -f '{{ vars.KILL_PATTERN }}' || fuser -k {{ vars.PORT }}/tcp"
+run_windows = "taskkill /F /IM main.exe"
+
+[tasks.start]
+alias = "s"
+depends = ["open", "dev"]
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+
+# ── Info ───────────────────────────────────────────────────────────────────────
+
+[tasks.info]
+alias = "i"
+run = """
+echo "project: {{ config_root | basename }}"
+echo "port:   {{ vars.PORT }}"
+echo "os:     {{ os() }}"
+echo "arch:   {{ arch() }}"
+echo "lang:   Go"
+echo "dir:    {{ config_root }}"
+"""
+dir = "{{ config_root }}"
+
+[tasks.docker]
+alias = "dk"
+run = "docker compose up -d && sleep 2 && xdg-open http://localhost:{{ vars.PORT }}"
+dir = "{{ config_root }}"
+
+[tasks.docker-down]
+run = "docker compose down"
+dir = "{{ config_root }}"
