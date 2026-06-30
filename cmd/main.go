@@ -91,15 +91,22 @@ func main() {
 		writeGuard = middleware.EditorGuardOff
 	}
 
+	noCacheStatic := func(next http.Handler) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Cache-Control", "no-store")
+			next.ServeHTTP(w, r)
+		}
+	}
+
 	staticFs := http.FileServer(http.Dir("./static"))
-	rootHandler := staticFs.ServeHTTP
+	rootHandler := noCacheStatic(staticFs)
 	if config.GetEditorMode() == "off" {
 		rootHandler = func(w http.ResponseWriter, r *http.Request) {
 			if strings.HasPrefix(r.URL.Path, "/editor") {
 				http.NotFound(w, r)
 				return
 			}
-			staticFs.ServeHTTP(w, r)
+			noCacheStatic(staticFs)(w, r)
 		}
 	}
 
@@ -107,6 +114,7 @@ func main() {
 		{Path: "/", Handler: rootHandler},
 		{Path: "/api/channels", Handler: mediaHandler.FetchAllChannels},
 		{Path: "/api/current-video", Handler: mediaHandler.GetCurrentVideo},
+		{Path: "/api/current-videos", Handler: mediaHandler.FetchAllCurrentVideos},
 		{Path: "/api/submit-list", Handler: mediaHandler.SubmitList},
 		{Path: "/api/invalidate-video", Handler: mediaHandler.InvalidateVideo},
 		{Path: "/api/config", Handler: handlers.GetConfigs},

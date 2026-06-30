@@ -72,6 +72,28 @@ func (s *MediaService) GetCurrentVideoByChannelId(channelId int) (*dbmodels.Vide
 	return &videos[videoIndex], nil
 }
 
+type ChannelWithVideo struct {
+	Channel dbmodels.Channel `json:"channel"`
+	Video   *dbmodels.Video  `json:"video"`
+}
+
+func (s *MediaService) GetCurrentVideos() ([]ChannelWithVideo, error) {
+	channels, err := s.ChannelRepo.FetchAllChannels()
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]ChannelWithVideo, 0, len(channels))
+	for _, ch := range channels {
+		video, err := s.GetCurrentVideoByChannelId(ch.ID)
+		if err != nil || video == nil {
+			continue
+		}
+		result = append(result, ChannelWithVideo{Channel: ch, Video: video})
+	}
+	return result, nil
+}
+
 func (s *MediaService) FetchNextVideo(channelId int, videoId string) *dbmodels.Video {
 	video, err := s.VideoRepo.FetchNextVideo(videoId, channelId)
 	if err != nil {

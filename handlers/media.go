@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
+	"time"
 
 	dbmodels "github.com/ozencb/couchtube/models/db"
 	jsonmodels "github.com/ozencb/couchtube/models/json"
@@ -78,9 +80,70 @@ func (h *Media) GetCurrentVideo(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{"video": video})
 }
 
+func (h *Media) FetchAllCurrentVideos(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	channels, err := h.Service.GetCurrentVideos()
+	if err != nil {
+		http.Error(w, "Failed to load current videos", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{"channels": channels})
+}
+
+var (
+	invalidationMu    sync.Mutex
+	invalidationTimes []time.Time
+)
+
+const (
+	invalidationThreshold = 10
+	invalidationWindow    = 60 * time.Second
+)
+
+func checkInvalidationRate() bool {
+	invalidationMu.Lock()
+	defer invalidationMu.Unlock()
+
+	now := time.Now()
+	cutoff := now.Add(-invalidationWindow)
+	filtered := invalidationTimes[:0]
+	for _, t := range invalidationTimes {
+		if t.After(cutoff) {
+			filtered = append(filtered, t)
+		}
+	}
+	invalidationTimes = filtered
+
+	return len(invalidationTimes) < invalidationThreshold
+}
+
+func recordInvalidation() {
+	invalidationMu.Lock()
+	invalidationTimes = append(invalidationTimes, time.Now())
+	invalidationMu.Unlock()
+}
+
 func (h *Media) InvalidateVideo(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	if !checkInvalidationRate() {
+		log.Default().Println("Invalidation rate limit hit — refusing delete to protect data")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusTooManyRequests)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   "rate limited — too many invalidations recently",
+		})
 		return
 	}
 
@@ -96,12 +159,13 @@ func (h *Media) InvalidateVideo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	recordInvalidation()
+
 	log.Default().Println("Video invalidated: ", videoID)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true})
-
 }
 
 func (h *Media) SubmitList(w http.ResponseWriter, r *http.Request) {
